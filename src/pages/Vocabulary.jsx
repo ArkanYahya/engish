@@ -51,7 +51,7 @@ export default function Vocabulary() {
   return (
     <IonPage>
       <IonContent {...rtlAttrs}>
-        <div className="ion-padding-horizontal ion-padding-top">
+        <div className="ref-page-head">
           <h1 className="ref-page-title">{t("vocabularyTitle", levelLabel)}</h1>
           <p className="ref-page-subtitle">{t("vocabularySubtitle", levelLabel)}</p>
         </div>

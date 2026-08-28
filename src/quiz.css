@@ -43,7 +43,11 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 16px 6px;
+  /* No IonHeader on this screen to absorb the iPhone notch/Dynamic Island/status bar area
+     for us (viewport-fit=cover in index.html puts content under it in standalone/installed
+     mode) — env(safe-area-inset-top) resolves to 0 on devices that don't need it, so this
+     is a no-op everywhere else. */
+  padding: calc(14px + env(safe-area-inset-top)) 16px 6px;
 }
 
 .quiz-top-title {
@@ -195,6 +199,12 @@ ion-item.mistake-item {
   --background: var(--coral-soft);
 }
 
+/* Vocabulary/Grammar's title block — replaces Ionic's .ion-padding-top utility, which is a
+   flat 16px and not safe-area-aware; same reasoning as .quiz-top above. */
+.ref-page-head {
+  padding: calc(16px + env(safe-area-inset-top)) 16px 0;
+}
+
 .ref-page-title {
   display: flex;
   align-items: center;
@@ -308,7 +318,8 @@ ion-item.mistake-item {
 
 /* ---------- Home (Level Picker) ---------- */
 .home-scroll {
-  padding: 20px 20px 8px;
+  /* Same safe-area reasoning as .quiz-top — Home has no IonHeader either. */
+  padding: calc(20px + env(safe-area-inset-top)) 20px 8px;
 }
 
 .home-head {
@@ -542,7 +553,10 @@ ion-item.mistake-item {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 20px 24px 32px;
+  /* Same safe-area reasoning as .quiz-top — the confetti dots are positioned as a percentage
+     of this container, so without this they can sit under the status bar on a device with a
+     tall safe-area-inset-top even though the container itself is vertically centered. */
+  padding: calc(20px + env(safe-area-inset-top)) 24px 32px;
   position: relative;
   overflow: hidden;
 }

@@ -34,7 +34,7 @@ export default function Grammar() {
   return (
     <IonPage>
       <IonContent {...rtlAttrs}>
-        <div className="ion-padding-horizontal ion-padding-top">
+        <div className="ref-page-head">
           <h1 className="ref-page-title">{t("grammarTitle", levelLabel)}</h1>
           <p className="ref-page-subtitle">{t("grammarSubtitle", levelLabel)}</p>
         </div>
