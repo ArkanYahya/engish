@@ -280,7 +280,7 @@ body {
    sprawling grid. */
 .stage-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(8, 1fr);
   gap: 4px;
   margin-bottom: 14px;
 }
@@ -292,7 +292,7 @@ body {
   border: 1px solid var(--border);
   background: var(--locked-bg);
   color: var(--locked-text);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -532,6 +532,12 @@ body {
   vertical-align: middle;
 }
 
+.header-links {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
 .link-btn {
   background: none;
   border: none;
@@ -609,7 +615,8 @@ h2 {
 
 /* The chevron icon points "forward" (right in LTR); mirror it for RTL so it still
    points toward reading-forward direction instead of visually pointing backward. */
-[dir="rtl"] .header-subtitle-chevron .icon {
+[dir="rtl"] .header-subtitle-chevron .icon,
+[dir="rtl"] .grammar-row-chevron .icon {
   transform: scaleX(-1);
 }
 
@@ -1224,6 +1231,73 @@ h2 {
 .vocab-ar {
   font-size: 14px;
   color: var(--text-secondary);
+}
+
+/* Disclosure hint on each grammar topic row — unlike vocab rows (which already show an
+   interactive speaker icon), a grammar row has no other visible affordance, so this chevron
+   is what signals "tap for the rule and examples". Points forward (right in LTR, mirrored
+   for RTL below), same convention as .header-subtitle-chevron. */
+.grammar-row-chevron {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.grammar-topic-title {
+  margin: 4px 0 14px;
+  font-size: 20px;
+}
+
+.grammar-rule-row,
+.grammar-example-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.grammar-rule-en {
+  flex: 1;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.grammar-rule-ar {
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.grammar-examples-label {
+  margin: 4px 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+}
+
+.grammar-examples-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.grammar-example-en {
+  flex: 1;
+  margin: 0;
+  font-size: 14px;
+}
+
+.grammar-example-ar {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.grammar-reveal-btn {
+  margin: 8px auto 0;
 }
 
 /* Mistake badge: shows how many times a word was recently missed in "Quiz Me".

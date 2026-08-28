@@ -1,9 +1,11 @@
 import { LEVELS, getLevel } from "./levels/index.js";
 import { VOCABULARY as A1_VOCABULARY } from "./levels/a1-vocabulary.js";
+import { GRAMMAR as A1_GRAMMAR } from "./levels/a1-grammar.js";
 
-// Vocabulary is level-specific (each level will eventually get its own list) — a level
-// with no entry here simply has no "Vocabulary" link/screen at all.
+// Vocabulary and grammar are level-specific (each level will eventually get its own) — a
+// level with no entry here simply has no "Vocabulary"/"Grammar" link/screen at all.
 const LEVEL_VOCABULARY = { a1: A1_VOCABULARY };
+const LEVEL_GRAMMAR = { a1: A1_GRAMMAR };
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
@@ -119,6 +121,11 @@ const STRINGS = {
     vocabulary: "Vocabulary",
     vocabularyTitle: (label) => `${label} Vocabulary`,
     vocabularySubtitle: (label) => `Browse core words from the ${label} level, with Arabic meanings and pronunciation.`,
+    grammar: "Grammar",
+    grammarTitle: (label) => `${label} Grammar`,
+    grammarSubtitle: (label) => `Core grammar rules for the ${label} level, with examples and Arabic translations.`,
+    grammarRuleLabel: "Rule",
+    grammarExamplesLabel: "Examples",
     quizMe: "Quiz Me",
     vocabQuizNext: "Next Word",
     vocabQuizScore: (score, total) => `Score: ${score}/${total}`,
@@ -180,6 +187,11 @@ const STRINGS = {
     vocabulary: "المفردات",
     vocabularyTitle: (label) => `مفردات المستوى ${label}`,
     vocabularySubtitle: (label) => `تصفح الكلمات الأساسية لمستوى ${label}، مع معانيها بالعربية ونطقها.`,
+    grammar: "القواعد",
+    grammarTitle: (label) => `قواعد المستوى ${label}`,
+    grammarSubtitle: (label) => `أهم قواعد اللغة لمستوى ${label}، مع أمثلة وترجمتها بالعربية.`,
+    grammarRuleLabel: "القاعدة",
+    grammarExamplesLabel: "أمثلة",
     quizMe: "اختبرني",
     vocabQuizNext: "الكلمة التالية",
     vocabQuizScore: (score, total) => `النتيجة: ${score}/${total}`,
@@ -293,6 +305,9 @@ function rerenderCurrentScreen() {
       // Re-rendering the same screen in place (e.g. a language toggle while already
       // viewing it) — must not overwrite the "return to" target with itself.
       renderVocabulary(true);
+      break;
+    case "grammar":
+      renderGrammar(true);
       break;
     default:
       renderLevelPicker();
@@ -535,11 +550,15 @@ function renderHeader(subtitle) {
   const answeredCount = state.answers.filter((a) => a !== null).length;
   const pct = Math.round((answeredCount / TOTAL_QUESTIONS) * 100);
   const hasVocab = !!LEVEL_VOCABULARY[currentLevel.id];
+  const hasGrammar = !!LEVEL_GRAMMAR[currentLevel.id];
   return `
     <div class="header" id="header-stages-trigger" ${rtlAttrs()}>
       <div class="header-top">
         <span class="level-tag">${currentLevel.label}</span>
-        ${hasVocab ? `<button id="vocabulary-btn" class="link-btn" type="button">${t("vocabulary")}</button>` : ""}
+        <div class="header-links">
+          ${hasVocab ? `<button id="vocabulary-btn" class="link-btn" type="button">${t("vocabulary")}</button>` : ""}
+          ${hasGrammar ? `<button id="grammar-btn" class="link-btn" type="button">${t("grammar")}</button>` : ""}
+        </div>
       </div>
       <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
       <div class="header-subtitle-row">
@@ -551,11 +570,16 @@ function renderHeader(subtitle) {
 }
 
 function attachHeaderEvents() {
-  // Wrapped in an arrow function — a bare `renderVocabulary` reference would receive the
-  // click Event as its first argument, which collides with the preserveReturn parameter.
+  // Wrapped in an arrow function — a bare `renderVocabulary`/`renderGrammar` reference
+  // would receive the click Event as its first argument, which for renderVocabulary
+  // collides with the preserveReturn parameter.
   document.getElementById("vocabulary-btn")?.addEventListener("click", (e) => {
     e.stopPropagation();
     renderVocabulary();
+  });
+  document.getElementById("grammar-btn")?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    renderGrammar();
   });
 }
 
@@ -1291,6 +1315,145 @@ function openVocabQuizModal() {
   }
 
   renderModalContent();
+}
+
+// Standalone reference screen (not tied to quiz progress), the grammar counterpart to
+// Vocabulary — same "remember where I came from" pattern, same level-scoping. No mistake
+// tracking or "Quiz Me" here: the main 500-question quiz already drills grammar; this is
+// purely the rule explanation it never gives up front.
+let grammarReturnView = { name: "levelPicker" };
+
+function currentLevelGrammar() {
+  return LEVEL_GRAMMAR[currentLevel?.id] || [];
+}
+
+function findGrammarTopic(topicName) {
+  return currentLevelGrammar().find((g) => g.topic === topicName);
+}
+
+function renderGrammar(preserveReturn = false) {
+  if (!preserveReturn) grammarReturnView = currentView;
+  currentView = { name: "grammar" };
+
+  const rows = currentLevelGrammar()
+    .map(
+      (g) => `
+        <div class="grammar-row vocab-row" data-topic="${g.topic.replace(/"/g, "&quot;")}" role="button" tabindex="0" aria-label="${g.topic}">
+          <div class="grammar-topic-info vocab-word">
+            <span class="grammar-topic-en vocab-en">${g.topic}</span>
+            <span class="grammar-topic-ar vocab-ar" dir="rtl" lang="ar">${g.topicAr}</span>
+          </div>
+          <span class="grammar-row-chevron">${icon("chevronRight")}</span>
+        </div>
+      `
+    )
+    .join("");
+
+  app.innerHTML = `
+    <div class="page">
+      ${renderTopBar()}
+      <div class="grammar-page vocab-page" ${rtlAttrs()}>
+        <div class="grammar-header vocab-header">
+          <button class="icon-btn grammar-back-btn vocab-back-btn" type="button" aria-label="${t("back")}">${icon("chevronRight")}</button>
+          <h1>${t("grammarTitle", currentLevel.label)}</h1>
+        </div>
+        <p class="grammar-subtitle vocab-subtitle">${t("grammarSubtitle", currentLevel.label)}</p>
+        <div class="grammar-list vocab-list" dir="ltr">${rows}</div>
+      </div>
+    </div>
+  `;
+
+  attachTopBarEvents();
+  document.querySelector(".grammar-back-btn").addEventListener("click", () => {
+    currentView = grammarReturnView;
+    rerenderCurrentScreen();
+  });
+
+  document.querySelectorAll(".grammar-row").forEach((row) => {
+    const openTopic = () => {
+      const topic = findGrammarTopic(row.dataset.topic);
+      if (topic) openGrammarTopicModal(topic);
+    };
+    row.addEventListener("click", openTopic);
+    row.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openTopic();
+      }
+    });
+  });
+}
+
+// Shows the rule plus a few example sentences, Arabic hidden until asked for — one toggle
+// reveals the rule's translation and every example's translation together, rather than a
+// separate reveal per line, to keep the modal from getting cluttered with icon buttons.
+function openGrammarTopicModal(topic) {
+  let revealed = false;
+
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  document.body.appendChild(overlay);
+
+  function close() {
+    document.removeEventListener("keydown", onKey);
+    overlay.remove();
+  }
+  function onKey(e) {
+    if (e.key === "Escape") close();
+  }
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) close();
+  });
+  document.addEventListener("keydown", onKey);
+
+  function render() {
+    overlay.innerHTML = `
+      <div class="modal-box grammar-topic-box" ${rtlAttrs()}>
+        <button class="modal-close" aria-label="${t("close")}">${icon("x")}</button>
+        <p class="modal-label">${t("grammar")}</p>
+        <h2 class="grammar-topic-title">${topic.topic}</h2>
+        <div class="grammar-rule-row">
+          <p class="grammar-rule-en" dir="ltr" lang="en">${topic.rule}</p>
+          <button class="icon-btn grammar-speak-btn" data-speak="${topic.rule.replace(/"/g, "&quot;")}" type="button" title="${t("listenToOption")}" aria-label="${t("listenToOption")}">${icon("speaker")}</button>
+        </div>
+        ${revealed ? `<p class="grammar-rule-ar" dir="rtl" lang="ar">${topic.ruleAr}</p>` : ""}
+        <p class="grammar-examples-label" ${rtlAttrs()}>${t("grammarExamplesLabel")}</p>
+        <div class="grammar-examples-list">
+          ${topic.examples
+            .map(
+              (ex) => `
+                <div class="grammar-example-row">
+                  <p class="grammar-example-en" dir="ltr" lang="en">${ex.en}</p>
+                  <button class="icon-btn grammar-speak-btn" data-speak="${ex.en.replace(/"/g, "&quot;")}" type="button" title="${t("listenToOption")}" aria-label="${t("listenToOption")}">${icon("speaker")}</button>
+                </div>
+                ${revealed ? `<p class="grammar-example-ar" dir="rtl" lang="ar">${ex.ar}</p>` : ""}
+              `
+            )
+            .join("")}
+        </div>
+        ${
+          revealed
+            ? ""
+            : `<button class="icon-btn grammar-reveal-btn" type="button" title="${t("showTranslation")}" aria-label="${t("showTranslation")}">${icon("globe")}</button>`
+        }
+      </div>
+    `;
+
+    overlay.querySelector(".modal-close").addEventListener("click", close);
+    overlay.querySelectorAll(".grammar-speak-btn").forEach((btn) => {
+      btn.addEventListener("click", () => speak(btn.dataset.speak));
+    });
+
+    const revealBtn = overlay.querySelector(".grammar-reveal-btn");
+    if (revealBtn) {
+      revealBtn.addEventListener("click", () => {
+        revealed = true;
+        render();
+      });
+    }
+  }
+
+  render();
 }
 
 const savedLevelId = localStorage.getItem(SELECTED_LEVEL_KEY);
