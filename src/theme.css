@@ -205,12 +205,6 @@ ion-button {
   --border-radius: 14px;
 }
 
-.level-progress {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--indigo);
-}
-
 /* A centered "popup" dialog instead of Ionic's default sheet/full-screen presentation —
    used for Settings and the question-translation modal, both short, single-purpose pieces
    of content that don't need a draggable sheet (unlike the stages/vocab/grammar modals,

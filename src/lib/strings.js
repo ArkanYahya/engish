@@ -24,6 +24,8 @@ export const LEVEL_TRANSLATIONS = {
 export const STRINGS = {
   en: {
     appName: "HamoLingo",
+    welcomeBack: "Welcome back",
+    navHome: "Home",
     settings: "Settings",
     language: "Language",
     darkMode: "Dark Mode",
@@ -91,6 +93,8 @@ export const STRINGS = {
   },
   ar: {
     appName: "HamoLingo",
+    welcomeBack: "أهلاً بعودتك",
+    navHome: "الرئيسية",
     settings: "الإعدادات",
     language: "اللغة",
     darkMode: "الوضع الداكن",

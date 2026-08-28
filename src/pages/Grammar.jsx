@@ -5,7 +5,7 @@ import { IonPage, IonContent, IonList, IonItem, IonLabel, IonBackButton, IonButt
 import { useQuiz } from "../context/QuizContext.jsx";
 import { useUiLang } from "../context/UiLangContext.jsx";
 import { LEVEL_GRAMMAR } from "../lib/content.js";
-import AppHeader from "../components/AppHeader.jsx";
+import BottomTabBar from "../components/BottomTabBar.jsx";
 import GrammarTopicModal from "../components/GrammarTopicModal.jsx";
 
 export default function Grammar() {
@@ -24,7 +24,6 @@ export default function Grammar() {
 
   return (
     <IonPage>
-      <AppHeader />
       <IonHeader>
         <IonToolbar {...rtlAttrs}>
           <IonButtons slot="start">
@@ -53,6 +52,7 @@ export default function Grammar() {
       </IonContent>
 
       <GrammarTopicModal topic={activeTopic} onDismiss={() => setActiveTopic(null)} />
+      <BottomTabBar active="grammar" levelId={levelId} />
     </IonPage>
   );
 }

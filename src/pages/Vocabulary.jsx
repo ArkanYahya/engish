@@ -8,7 +8,7 @@ import { useUiLang } from "../context/UiLangContext.jsx";
 import { LEVEL_VOCABULARY } from "../lib/content.js";
 import { getVocabMistakeCount } from "../lib/storage.js";
 import { speak } from "../lib/tts.js";
-import AppHeader from "../components/AppHeader.jsx";
+import BottomTabBar from "../components/BottomTabBar.jsx";
 import VocabExampleModal from "../components/VocabExampleModal.jsx";
 import VocabQuizModal from "../components/VocabQuizModal.jsx";
 
@@ -47,7 +47,6 @@ export default function Vocabulary() {
 
   return (
     <IonPage>
-      <AppHeader />
       <IonHeader>
         <IonToolbar {...rtlAttrs}>
           <IonButtons slot="start">
@@ -110,6 +109,7 @@ export default function Vocabulary() {
 
       <VocabExampleModal word={activeWord} onDismiss={closeExample} />
       <VocabQuizModal isOpen={quizOpen} onDismiss={closeQuiz} vocabulary={vocabulary} />
+      <BottomTabBar active="vocabulary" levelId={levelId} />
     </IonPage>
   );
 }
