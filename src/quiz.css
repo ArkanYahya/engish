@@ -162,35 +162,6 @@
   margin: 0;
 }
 
-/* Mistake badge: shows how many times a word was recently missed in "Quiz Me". Fixed,
-   theme-independent colors so severity reads the same in light and dark mode. */
-.vocab-mistake-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1;
-  color: #ffffff;
-  flex-shrink: 0;
-}
-
-.vocab-mistake-badge.tier-1 {
-  background: #f59e0b;
-}
-
-.vocab-mistake-badge.tier-2 {
-  background: #f97316;
-}
-
-.vocab-mistake-badge.tier-3 {
-  background: #ef4444;
-}
-
 .vocab-en,
 .grammar-topic-en {
   font-weight: 600;
@@ -210,6 +181,12 @@
    and the perfect-stage dot) rather than introducing a new color. */
 ion-item.read-item {
   --background: var(--leaf-soft);
+}
+
+/* A currently-mistaken word — same light-red the main quiz already uses for a wrong
+   answer (--coral-soft), instead of a separate numeric badge. */
+ion-item.mistake-item {
+  --background: var(--coral-soft);
 }
 
 .ref-page-title {
@@ -499,42 +476,6 @@ ion-item.read-item {
 
 .modal-label:first-child {
   margin-top: 0;
-}
-
-.feedback {
-  border-radius: 8px;
-  padding: 12px 14px;
-  margin: 16px 0;
-  font-size: 14px;
-  border: 1px solid transparent;
-}
-
-.feedback strong {
-  display: block;
-  margin-bottom: 4px;
-}
-
-.feedback p {
-  margin: 0;
-}
-
-.feedback-ar {
-  margin-top: 8px !important;
-  padding-top: 8px;
-  border-top: 1px solid rgba(127, 127, 127, 0.25);
-  font-size: 14px;
-}
-
-.feedback-correct {
-  background: var(--success-bg);
-  color: var(--success-text);
-  border-color: var(--success-border-soft);
-}
-
-.feedback-incorrect {
-  background: var(--danger-bg);
-  color: var(--danger-text);
-  border-color: var(--danger-border-soft);
 }
 
 .score-gauge {

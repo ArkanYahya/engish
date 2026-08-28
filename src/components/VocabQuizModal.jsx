@@ -13,27 +13,20 @@ import { pickVocabQuizQuestion } from "../lib/vocabQuiz.js";
 export default function VocabQuizModal({ isOpen, onDismiss, targetWords, distractorWords, title }) {
   const { t, rtlAttrs } = useUiLang();
   const [current, setCurrent] = useState(null);
-  const [score, setScore] = useState(0);
-  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     if (isOpen && targetWords.length > 0) {
       setCurrent(pickVocabQuizQuestion(targetWords, distractorWords));
-      setScore(0);
-      setTotal(0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   const answered = current?.pickedIndex != null;
-  const isCorrect = answered && current.options[current.pickedIndex].ar === current.correctAr;
 
   function pick(idx) {
     if (answered) return;
     const correct = current.options[idx].ar === current.correctAr;
-    setTotal((n) => n + 1);
     if (correct) {
-      setScore((s) => s + 1);
       bumpVocabMistake(current.category, current.word, -1);
     } else {
       bumpVocabMistake(current.category, current.word, 1);
@@ -55,7 +48,6 @@ export default function VocabQuizModal({ isOpen, onDismiss, targetWords, distrac
       </IonHeader>
       {current && (
         <IonContent className="ion-padding" {...rtlAttrs}>
-          <p>{t("vocabQuizScore", score, total)}</p>
           <div className="grammar-rule-row" dir="ltr">
             <h2 style={{ margin: 0 }} dir="ltr" lang="en">
               {current.word}
@@ -89,12 +81,6 @@ export default function VocabQuizModal({ isOpen, onDismiss, targetWords, distrac
               </div>
             );
           })}
-
-          {answered && (
-            <div className={`feedback ${isCorrect ? "feedback-correct" : "feedback-incorrect"}`}>
-              <strong {...rtlAttrs}>{isCorrect ? t("correct") : t("notQuite")}</strong>
-            </div>
-          )}
 
           <IonButton
             expand="block"

@@ -76,28 +76,22 @@ export default function Vocabulary() {
               <IonItemDivider {...rtlAttrs}>{isArabicUi ? group.categoryAr : group.category}</IonItemDivider>
               {group.words.map((w) => {
                 const missCount = getVocabMistakeCount(group.category, w.en);
-                const tier = Math.min(missCount, 3);
                 const isRead = isVocabWordRead(group.category, w.en);
+                // A currently-mistaken word gets the same light-red the main quiz uses for a
+                // wrong answer (--coral-soft) — takes priority over the "read" green tint,
+                // since it's the more actionable signal of the two.
+                const rowClass = missCount > 0 ? "mistake-item" : isRead ? "read-item" : "";
                 return (
                   <IonItem
                     key={w.en}
                     button
                     detail
-                    className={isRead ? "read-item" : ""}
+                    className={rowClass}
                     onClick={() => openExample(group.category, w)}
                     {...rtlAttrs}
                   >
                     <IonLabel dir="ltr" lang="en" style={{ textAlign: isArabicUi ? "right" : "left" }}>
                       <span className="vocab-en">{w.en}</span>
-                      {missCount > 0 && (
-                        <span
-                          className={`vocab-mistake-badge tier-${tier}`}
-                          title={t("missedTimes", missCount)}
-                          style={{ marginLeft: 8 }}
-                        >
-                          {missCount}
-                        </span>
-                      )}
                       <span className="vocab-ar" dir="rtl" lang="ar">
                         {w.ar}
                       </span>
