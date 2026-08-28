@@ -963,3 +963,142 @@ ion-item.mistake-item {
   flex: 1;
   margin: 0;
 }
+
+/* ---------- Settings sheet (see components/SettingsModal.jsx) ----------
+   Every row here is fixed, short content (not a scrollable list), so the sheet is sized to
+   fit it snugly rather than reserving a stock fraction of the viewport — a bare 40% breakpoint
+   left a large dead paper-colored gap below the last row, which is what read as "bulky". */
+.settings-sheet-body ion-item {
+  --min-height: 46px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+}
+
+.settings-section-label {
+  margin: 12px 16px 2px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+}
+
+.settings-lang-row {
+  display: flex;
+  gap: 10px;
+  padding: 4px 16px 10px;
+}
+
+.settings-lang-btn {
+  flex: 1;
+  border: 2px solid var(--line-strong);
+  border-radius: 14px;
+  background: var(--paper-raised);
+  padding: 8px 12px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.settings-lang-btn:active {
+  transform: scale(0.96);
+}
+
+.settings-lang-btn.active {
+  border-color: var(--indigo);
+  background: var(--indigo-soft);
+  color: var(--indigo);
+}
+
+/* ---------- About screen (see components/AboutModal.jsx) ---------- */
+.about-scroll {
+  overflow-y: auto;
+  max-height: calc(80vh - 56px); /* 80vh matches .popup-modal's --max-height; 56px ≈ toolbar height */
+  padding: 0 18px 14px;
+}
+
+.about-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 3px;
+  padding: 2px 0 4px;
+}
+
+.about-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  margin-bottom: 4px;
+  box-shadow: 0 10px 20px -12px rgba(var(--shadow-color), 0.4);
+}
+
+.about-app-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 16px;
+  margin: 0;
+}
+
+.about-version {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  margin: 0 0 10px;
+}
+
+.about-text {
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  line-height: 1.4;
+  max-width: 320px;
+  margin: 0 0 6px;
+}
+
+.about-text-muted {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.about-developer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 9px 12px;
+  border-radius: 14px;
+  background: var(--indigo-soft);
+  color: var(--indigo);
+  text-decoration: none;
+  font-size: 12px;
+  line-height: 1.3;
+  text-align: start;
+}
+
+.about-developer ion-icon {
+  flex-shrink: 0;
+  font-size: 17px;
+}
+
+.about-thanks {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 9px 12px;
+  border-radius: 14px;
+  background: var(--coral-soft);
+  color: var(--coral);
+  text-decoration: none;
+  font-size: 12px;
+  line-height: 1.3;
+  text-align: start;
+}
+
+.about-thanks ion-icon {
+  flex-shrink: 0;
+  font-size: 17px;
+}

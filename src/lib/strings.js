@@ -35,7 +35,6 @@ export const STRINGS = {
     close: "Close",
     switchToLight: "Switch to light mode",
     switchToDark: "Switch to dark mode",
-    switchUiLang: "عربي",
     vocabulary: "Vocabulary",
     vocabularyTitle: (label) => `${label} Vocabulary`,
     vocabularySubtitle: (label) => `Browse core words from the ${label} level, with Arabic meanings and pronunciation.`,
@@ -104,6 +103,14 @@ export const STRINGS = {
     onboardingFinishTitle: "You're all set!",
     onboardingFinishBody: "Let's start learning English.",
     onboardingGetStarted: "Get Started",
+    about: "About",
+    aboutVersion: (v) => `Version ${v}`,
+    aboutDescription:
+      "HamoLingo helps you learn English through bilingual English–Arabic quizzes across four CEFR levels, A1 to B2.",
+    aboutWordListCredit:
+      "Vocabulary is sourced from the Oxford 3000, a research-backed list of the words English learners need most.",
+    aboutDeveloper: "Developed by Arkan Yahya",
+    aboutThanks: "Thanks to Mohammed Faris for helping improve the app.",
   },
   ar: {
     appName: "HamoLingo",
@@ -118,7 +125,6 @@ export const STRINGS = {
     close: "إغلاق",
     switchToLight: "التبديل إلى الوضع الفاتح",
     switchToDark: "التبديل إلى الوضع الداكن",
-    switchUiLang: "English",
     vocabulary: "المفردات",
     vocabularyTitle: (label) => `مفردات المستوى ${label}`,
     vocabularySubtitle: (label) => `تصفح الكلمات الأساسية لمستوى ${label}، مع معانيها بالعربية ونطقها.`,
@@ -187,5 +193,13 @@ export const STRINGS = {
     onboardingFinishTitle: "كل شيء جاهز!",
     onboardingFinishBody: "لنبدأ تعلم الإنجليزية.",
     onboardingGetStarted: "ابدأ الآن",
+    about: "حول التطبيق",
+    aboutVersion: (v) => `الإصدار ${v}`,
+    aboutDescription:
+      "يساعدك HamoLingo على تعلم الإنجليزية من خلال اختبارات ثنائية اللغة (إنجليزي/عربي) عبر أربعة مستويات وفق إطار CEFR، من A1 إلى B2.",
+    aboutWordListCredit:
+      "المفردات مأخوذة من قائمة Oxford 3000، وهي قائمة مدعومة بالأبحاث لأهم الكلمات التي يحتاجها متعلمو الإنجليزية.",
+    aboutDeveloper: "تم التطوير بواسطة اركان يحيى",
+    aboutThanks: "شكراً لمحمد فارس لمساعدته في تطوير التطبيق.",
   },
 };

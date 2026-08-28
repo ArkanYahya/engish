@@ -1,8 +1,16 @@
+import { readFileSync } from "node:fs";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 
+// Single source of truth for the version shown on the About screen — read straight from
+// package.json at build time so it can't drift out of sync with a hand-copied string.
+const { version: appVersion } = JSON.parse(readFileSync(new URL("./package.json", import.meta.url)));
+
 export default defineConfig({
+  define: {
+    __APP_VERSION__: JSON.stringify(appVersion),
+  },
   plugins: [
     react(),
     // Replaces the old hand-rolled public/sw.js, which precached assets by regex-scraping

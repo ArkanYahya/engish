@@ -6,6 +6,7 @@ import { useUiLang } from "../context/UiLangContext.jsx";
 import { LEVEL_VOCABULARY, LEVEL_GRAMMAR } from "../lib/content.js";
 import { HomeIcon, BookIcon, GrammarIcon, SettingsIcon } from "./icons.jsx";
 import SettingsModal from "./SettingsModal.jsx";
+import AboutModal from "./AboutModal.jsx";
 
 // Persistent bottom navigation for the "browsing" screens (Home, Vocabulary, Grammar) —
 // replaces the old fixed top toolbar there. Vocabulary/Grammar are level-scoped and only
@@ -17,6 +18,11 @@ export default function BottomTabBar({ active, levelId }) {
   const navigate = useNavigate();
   const { t, isArabicUi } = useUiLang();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  // Owned up here, not inside SettingsModal — Settings closes itself the instant About is
+  // picked (see SettingsModal), and IonModal drops its children while isOpen is false, so
+  // an <AboutModal> nested inside SettingsModal's own JSX would get unmounted right along
+  // with it. Keeping both as siblings, each independently controlled, avoids that.
+  const [aboutOpen, setAboutOpen] = useState(false);
 
   const hasVocab = !!(levelId && LEVEL_VOCABULARY[levelId]);
   const hasGrammar = !!(levelId && LEVEL_GRAMMAR[levelId]);
@@ -53,7 +59,12 @@ export default function BottomTabBar({ active, levelId }) {
           </button>
         </nav>
       </IonFooter>
-      <SettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <SettingsModal
+        isOpen={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        onOpenAbout={() => setAboutOpen(true)}
+      />
+      <AboutModal isOpen={aboutOpen} onClose={() => setAboutOpen(false)} />
     </>
   );
 }
