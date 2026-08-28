@@ -39,6 +39,7 @@ export default function GrammarTopicModal({ topic, onDismiss }) {
         <IonContent className="ion-padding" {...rtlAttrs}>
           <p className="modal-label">{t("grammar")}</p>
           <h2 style={{ margin: "4px 0 14px" }}>{displayTopic.topic}</h2>
+          {displayTopic.testedInQuiz === false && <p className="grammar-bonus-note">{t("grammarBonusNote")}</p>}
 
           <div className="grammar-rule-row">
             <p className="grammar-rule-en" dir="ltr" lang="en">

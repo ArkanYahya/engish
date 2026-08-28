@@ -193,6 +193,29 @@
   font-weight: 600;
 }
 
+/* Flags an A1 grammar topic the quiz never actually tests (see levels/a1-grammar.js) —
+   a small, quiet badge rather than a silent gap between reference and quiz content. */
+.grammar-bonus-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--surface-subtle);
+  color: var(--ink-faint);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  vertical-align: middle;
+}
+
+.grammar-bonus-note {
+  margin: -8px 0 14px;
+  font-size: 12.5px;
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
 .vocab-ar,
 .grammar-topic-ar {
   color: var(--text-secondary);

@@ -1,10 +1,16 @@
-// A1 vocabulary reference list — reuses the same English/Arabic word pairs already
+// A1 vocabulary reference — reuses the same English/Arabic word pairs already
 // validated in the A1 quiz generators (a1.js), just restructured for browsing/study
 // rather than as multiple-choice questions.
 //
 // Each word also carries `ex`/`exAr`: a simple A1-level example sentence showing the
 // word used naturally, plus its Arabic translation (shown on demand in the UI, not
 // eagerly, so learners try to read the English sentence first).
+//
+// Every word's CEFR level is verified against the Oxford 3000 by CEFR level (Oxford
+// University Press) — see the "Additional Vocabulary" category for words relocated
+// here from other levels after that audit, and new topic categories for words added
+// fresh to fill the resulting gap. Multi-word phrases and proper nouns (countries,
+// days, months, numbers) aren't in the Oxford list and were left as originally placed.
 
 export const VOCABULARY = [
   {
@@ -22,10 +28,7 @@ export const VOCABULARY = [
       { en: "bird", ar: "طائر", ex: "A small bird is singing in the tree.", exAr: "طائر صغير يغني على الشجرة." },
       { en: "fish", ar: "سمكة", ex: "We saw many fish in the river.", exAr: "رأينا أسماكًا كثيرة في النهر." },
       { en: "rabbit", ar: "أرنب", ex: "The rabbit is hiding in the garden.", exAr: "الأرنب يختبئ في الحديقة." },
-      { en: "monkey", ar: "قرد", ex: "The monkey climbed up the tall tree.", exAr: "القرد تسلق الشجرة العالية." },
-      { en: "bear", ar: "دب", ex: "The bear sleeps all winter.", exAr: "الدب ينام طوال الشتاء." },
       { en: "duck", ar: "بطة", ex: "The duck is swimming in the pond.", exAr: "البطة تسبح في البركة." },
-      { en: "frog", ar: "ضفدع", ex: "The frog jumped into the water.", exAr: "الضفدع قفز إلى الماء." },
     ],
   },
   {
@@ -80,15 +83,12 @@ export const VOCABULARY = [
       { en: "dress", ar: "فستان", ex: "The dress is too long for her.", exAr: "الفستان طويل جدًا عليها." },
       { en: "jacket", ar: "سترة", ex: "Put on your jacket, it's cold outside.", exAr: "ارتدِ سترتك، الجو بارد في الخارج." },
       { en: "socks", ar: "جوارب", ex: "I can't find my socks.", exAr: "لا أستطيع إيجاد جواربي." },
-      { en: "pants", ar: "بنطال", ex: "These pants are a little tight.", exAr: "هذا البنطال ضيق قليلًا." },
       { en: "skirt", ar: "تنورة", ex: "She bought a new skirt yesterday.", exAr: "اشترت تنورة جديدة أمس." },
       { en: "coat", ar: "معطف", ex: "He hung his coat behind the door.", exAr: "علّق معطفه خلف الباب." },
       { en: "gloves", ar: "قفازات", ex: "Wear your gloves, your hands will be cold.", exAr: "ارتدِ قفازاتك، ستكون يداك باردتين." },
       { en: "scarf", ar: "وشاح", ex: "She wrapped a warm scarf around her neck.", exAr: "لفت وشاحًا دافئًا حول رقبتها." },
       { en: "sweater", ar: "كنزة صوفية", ex: "I need a sweater in winter.", exAr: "أحتاج إلى كنزة صوفية في الشتاء." },
       { en: "jeans", ar: "جينز", ex: "He always wears blue jeans.", exAr: "هو دائمًا يرتدي جينز أزرق." },
-      { en: "tie", ar: "ربطة عنق", ex: "My father wears a tie to work.", exAr: "أبي يرتدي ربطة عنق إلى العمل." },
-      { en: "belt", ar: "حزام", ex: "This belt matches your shoes.", exAr: "هذا الحزام يناسب حذاءك." },
     ],
   },
   {
@@ -293,8 +293,6 @@ export const VOCABULARY = [
     ],
   },
   {
-    // Sourced from the Oxford 3000 (CEFR A1 band) — the words below fill out A1's list to
-    // 250 with additional Oxford-A1 items not already covered by the categories above.
     category: "Places & the World",
     categoryAr: "الأماكن والعالم",
     words: [
@@ -359,6 +357,57 @@ export const VOCABULARY = [
       { en: "hobby", ar: "هواية", ex: "Painting is my favorite hobby.", exAr: "الرسم هو هوايتي المفضلة." },
       { en: "party", ar: "حفلة", ex: "We are having a party on Saturday.", exAr: "سنقيم حفلة يوم السبت." },
       { en: "weather", ar: "طقس", ex: "The weather is lovely today.", exAr: "الطقس جميل اليوم." },
+    ],
+  },
+  {
+    category: "Additional Vocabulary",
+    categoryAr: "مفردات إضافية",
+    words: [
+      { en: "yesterday", ar: "أمس", ex: "I visited my grandmother yesterday.", exAr: "زرت جدتي أمس." },
+      { en: "ago", ar: "منذ", ex: "She moved here two years ago.", exAr: "انتقلت إلى هنا منذ سنتين." },
+      { en: "tomorrow", ar: "غدًا", ex: "We have a meeting tomorrow.", exAr: "لدينا اجتماع غدًا." },
+      { en: "soon", ar: "قريبًا", ex: "The train will arrive soon.", exAr: "سيصل القطار قريبًا." },
+      { en: "later", ar: "لاحقًا", ex: "Can we talk about this later?", exAr: "هل يمكننا الحديث عن هذا لاحقًا؟" },
+      { en: "still", ar: "لا يزال", ex: "She is still waiting for the bus.", exAr: "لا تزال تنتظر الحافلة." },
+    ],
+  },
+  {
+    // Matches the 30 synonym pairs tested by generateSynonyms() in a1.js — the quiz asks
+    // "which word means the same as X", and this reference was the one A1 category with
+    // no matching vocabulary content at all until this audit found the gap.
+    category: "Synonyms",
+    categoryAr: "المرادفات",
+    words: [
+      { en: "big / large", ar: "كبير", ex: "It's a big house. Some people would call it a large house.", exAr: "إنه منزل كبير. قد يسميه بعض الناس منزلاً واسعًا." },
+      { en: "small / little", ar: "صغير", ex: "The kitten is small. It's a little animal.", exAr: "القطة صغيرة. إنها حيوان صغير." },
+      { en: "happy / glad", ar: "سعيد", ex: "I'm happy to see you. I'm glad you came.", exAr: "أنا سعيد برؤيتك. يسرني أنك أتيت." },
+      { en: "sad / unhappy", ar: "حزين", ex: "She looked sad. She seemed unhappy about the news.", exAr: "بدت حزينة. بدت غير سعيدة بالخبر." },
+      { en: "fast / quick", ar: "سريع", ex: "He is a fast runner. He gave a quick answer too.", exAr: "هو عداء سريع. وقد أعطى إجابة سريعة أيضًا." },
+      { en: "begin / start", ar: "يبدأ", ex: "The film will begin soon. Let's start watching.", exAr: "سيبدأ الفيلم قريبًا. لنبدأ المشاهدة." },
+      { en: "end / finish", ar: "ينتهي", ex: "The lesson will end at noon. We finish at the same time every day.", exAr: "سينتهي الدرس عند الظهر. ننتهي في نفس الوقت كل يوم." },
+      { en: "buy / purchase", ar: "يشتري", ex: "I want to buy a new phone. I'll purchase it online.", exAr: "أريد أن أشتري هاتفًا جديدًا. سأشتريه عبر الإنترنت." },
+      { en: "look / see", ar: "ينظر / يرى", ex: "Look at that bird! Can you see it?", exAr: "انظر إلى ذلك الطائر! هل تراه؟" },
+      { en: "talk / speak", ar: "يتحدث", ex: "Can we talk for a minute? I need to speak to you.", exAr: "هل يمكننا التحدث لدقيقة؟ أحتاج إلى التحدث معك." },
+      { en: "house / home", ar: "منزل", ex: "This is our house. It feels like home.", exAr: "هذا منزلنا. يشعرك وكأنك في بيتك." },
+      { en: "car / automobile", ar: "سيارة", ex: "He bought a new car. It's a very modern automobile.", exAr: "اشترى سيارة جديدة. إنها سيارة حديثة جدًا." },
+      { en: "smart / clever", ar: "ذكي", ex: "She is a smart student. Her clever ideas surprise everyone.", exAr: "هي طالبة ذكية. أفكارها الذكية تفاجئ الجميع." },
+      { en: "pretty / beautiful", ar: "جميل", ex: "That's a pretty dress. It looks beautiful on you.", exAr: "هذا فستان جميل. يبدو رائعًا عليك." },
+      { en: "angry / mad", ar: "غاضب", ex: "He was angry about the delay. He seemed really mad.", exAr: "كان غاضبًا بسبب التأخير. بدا غاضبًا حقًا." },
+      { en: "tired / sleepy", ar: "متعب", ex: "I'm tired after work. I feel sleepy too.", exAr: "أنا متعب بعد العمل. أشعر بالنعاس أيضًا." },
+      { en: "scared / afraid", ar: "خائف", ex: "The kids were scared of the dog. They were afraid it would bark.", exAr: "كان الأطفال خائفين من الكلب. كانوا خائفين أن ينبح." },
+      { en: "easy / simple", ar: "سهل", ex: "This exercise is easy. It's a simple question.", exAr: "هذا التمرين سهل. إنه سؤال بسيط." },
+      { en: "hard / difficult", ar: "صعب", ex: "The exam was hard. It was a difficult test.", exAr: "كان الامتحان صعبًا. كان اختبارًا صعبًا." },
+      { en: "cold / chilly", ar: "بارد", ex: "It's cold outside today. The wind feels chilly.", exAr: "الجو بارد بالخارج اليوم. الرياح تشعرك بالبرودة." },
+      { en: "hot / warm", ar: "دافئ / حار", ex: "The soup is hot. It's a nice warm meal.", exAr: "الحساء ساخن. إنه وجبة دافئة لطيفة." },
+      { en: "nice / kind", ar: "لطيف", ex: "She is a nice person. Everyone says she is very kind.", exAr: "هي شخص لطيف. يقول الجميع إنها لطيفة جدًا." },
+      { en: "funny / amusing", ar: "مضحك", ex: "That was a funny movie. I found it very amusing.", exAr: "كان ذلك فيلمًا مضحكًا. وجدته مسليًا جدًا." },
+      { en: "job / work", ar: "عمل", ex: "She has a new job. She starts work on Monday.", exAr: "لديها وظيفة جديدة. ستبدأ العمل يوم الاثنين." },
+      { en: "food / meal", ar: "طعام", ex: "The food here is great. Every meal is delicious.", exAr: "الطعام هنا رائع. كل وجبة لذيذة." },
+      { en: "kid / child", ar: "طفل", ex: "That kid loves to play outside. Every child needs fresh air.", exAr: "ذلك الطفل يحب اللعب بالخارج. كل طفل يحتاج إلى هواء نقي." },
+      { en: "friend / buddy", ar: "صديق", ex: "He is my best friend. We've been buddies since school.", exAr: "هو صديقي المفضل. كنا أصدقاء منذ المدرسة." },
+      { en: "gift / present", ar: "هدية", ex: "I bought her a gift. She loved the present.", exAr: "اشتريت لها هدية. أحبت الهدية." },
+      { en: "shout / yell", ar: "يصرخ", ex: "Don't shout in the library. Please don't yell.", exAr: "لا تصرخ في المكتبة. من فضلك لا تصرخ." },
+      { en: "jump / leap", ar: "يقفز", ex: "The dog can jump very high. It loves to leap over fences.", exAr: "الكلب يستطيع القفز عاليًا جدًا. يحب القفز فوق الأسوار." },
     ],
   },
 ];

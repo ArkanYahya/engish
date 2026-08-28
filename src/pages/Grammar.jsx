@@ -58,6 +58,7 @@ export default function Grammar() {
             >
               <IonLabel dir="ltr" lang="en">
                 <span className="grammar-topic-en">{g.topic}</span>
+                {g.testedInQuiz === false && <span className="grammar-bonus-badge">{t("grammarBonusBadge")}</span>}
                 <span className="grammar-topic-ar" dir="rtl" lang="ar">
                   {bidiSafe(g.topicAr)}
                 </span>
