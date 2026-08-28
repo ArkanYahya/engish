@@ -52,7 +52,7 @@ export default function VocabQuizModal({ isOpen, onDismiss, vocabulary }) {
       {current && (
         <IonContent className="ion-padding" {...rtlAttrs}>
           <p>{t("vocabQuizScore", score, total)}</p>
-          <div className="grammar-rule-row">
+          <div className="grammar-rule-row" dir="ltr">
             <h2 style={{ margin: 0 }} dir="ltr" lang="en">
               {current.word}
             </h2>

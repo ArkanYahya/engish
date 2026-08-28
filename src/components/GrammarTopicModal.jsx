@@ -38,10 +38,12 @@ export default function GrammarTopicModal({ topic, onDismiss }) {
       {displayTopic && (
         <IonContent className="ion-padding" {...rtlAttrs}>
           <p className="modal-label">{t("grammar")}</p>
-          <h2 style={{ margin: "4px 0 14px" }}>{displayTopic.topic}</h2>
+          <h2 style={{ margin: "4px 0 14px" }} dir="ltr" lang="en">
+            {displayTopic.topic}
+          </h2>
           {displayTopic.testedInQuiz === false && <p className="grammar-bonus-note">{t("grammarBonusNote")}</p>}
 
-          <div className="grammar-rule-row">
+          <div className="grammar-rule-row" dir="ltr">
             <p className="grammar-rule-en" dir="ltr" lang="en">
               {displayTopic.rule}
             </p>
@@ -60,7 +62,7 @@ export default function GrammarTopicModal({ topic, onDismiss }) {
           </p>
           {displayTopic.examples.map((ex, i) => (
             <div key={i}>
-              <div className="grammar-example-row">
+              <div className="grammar-example-row" dir="ltr">
                 <p className="grammar-example-en" dir="ltr" lang="en">
                   {ex.en}
                 </p>

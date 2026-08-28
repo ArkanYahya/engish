@@ -154,7 +154,10 @@
   margin-bottom: 10px;
 }
 
-.option-row ion-button {
+/* Only the answer pill should stretch — the trailing speaker icon (Question, Quiz Me)
+   isn't always present, but when it is, it must stay compact instead of sharing the row
+   50/50 with the answer button. */
+.option-row ion-button:first-child {
   flex: 1;
   margin: 0;
 }

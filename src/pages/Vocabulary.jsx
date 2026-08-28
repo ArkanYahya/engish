@@ -72,6 +72,7 @@ export default function Vocabulary() {
                     detail
                     className={isRead ? "read-item" : ""}
                     onClick={() => openExample(group.category, w)}
+                    {...rtlAttrs}
                   >
                     <IonLabel dir="ltr" lang="en">
                       <span className="vocab-en">{w.en}</span>

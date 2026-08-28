@@ -37,7 +37,7 @@ export default function VocabExampleModal({ word, onDismiss }) {
       {displayWord && (
         <IonContent className="ion-padding" {...rtlAttrs}>
           <p className="modal-label">{t("exampleSentence")}</p>
-          <div className="grammar-rule-row">
+          <div className="grammar-rule-row" dir="ltr">
             <h2 style={{ margin: 0 }} dir="ltr" lang="en">
               {displayWord.en}
             </h2>
@@ -45,7 +45,7 @@ export default function VocabExampleModal({ word, onDismiss }) {
               <IonIcon icon={volumeHighOutline} slot="icon-only" />
             </IonButton>
           </div>
-          <div className="grammar-rule-row">
+          <div className="grammar-rule-row" dir="ltr">
             <p className="grammar-rule-en" dir="ltr" lang="en">
               {displayWord.ex}
             </p>

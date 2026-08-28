@@ -48,6 +48,7 @@ export default function Grammar() {
               detail
               className={isGrammarTopicRead(levelId, g.topic) ? "read-item" : ""}
               onClick={() => openTopic(g)}
+              {...rtlAttrs}
             >
               <IonLabel dir="ltr" lang="en">
                 <span className="grammar-topic-en">{g.topic}</span>
