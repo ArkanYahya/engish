@@ -13,14 +13,15 @@ const ACCENTS = ["violet", "red"];
 // card read as visually confusing, whereas a card over a sheet reads as an actual menu item
 // opening.
 //
-// About lives as a sibling in BottomTabBar, not nested here — see the comment there for why.
-export default function SettingsModal({ isOpen, onClose, onOpenAbout }) {
+// About and the backup/restore file-picker live as siblings in BottomTabBar, not nested
+// here — see the comment there for why.
+export default function SettingsModal({ isOpen, onClose, onOpenAbout, onBackup, onRestoreClick }) {
   const { isDark, selectMode, accent, selectAccent } = useTheme();
   const { uiLang, t, rtlAttrs, toggleUiLang } = useUiLang();
 
   // Every choice in this sheet dismisses it, same as a native action sheet — picking a
-  // language, an accent, flipping dark mode, or opening About all close the menu behind
-  // them rather than leaving it sitting open once its job is done.
+  // language, an accent, flipping dark mode, or picking About/Backup/Restore all close the
+  // menu behind them rather than leaving it sitting open once its job is done.
   function selectLanguage(lang) {
     if (lang !== uiLang) toggleUiLang();
     onClose();
@@ -41,8 +42,18 @@ export default function SettingsModal({ isOpen, onClose, onOpenAbout }) {
     onClose();
   }
 
+  function backup() {
+    onBackup();
+    onClose();
+  }
+
+  function restore() {
+    onRestoreClick();
+    onClose();
+  }
+
   return (
-    <IonModal isOpen={isOpen} onDidDismiss={onClose} initialBreakpoint={0.48} breakpoints={[0, 0.48]}>
+    <IonModal isOpen={isOpen} onDidDismiss={onClose} initialBreakpoint={0.68} breakpoints={[0, 0.68]}>
       <IonHeader>
         <IonToolbar {...rtlAttrs}>
           <IonTitle>{t("settings")}</IonTitle>
@@ -94,6 +105,13 @@ export default function SettingsModal({ isOpen, onClose, onOpenAbout }) {
             slot="end"
             aria-label={isDark ? t("switchToLight") : t("switchToDark")}
           />
+        </IonItem>
+        <p className="settings-section-label">{t("data")}</p>
+        <IonItem button onClick={backup} lines="none">
+          <IonLabel>{t("backupProgress")}</IonLabel>
+        </IonItem>
+        <IonItem button onClick={restore} lines="none">
+          <IonLabel>{t("restoreProgress")}</IonLabel>
         </IonItem>
         <IonItem button onClick={openAbout} lines="none" detail>
           <IonLabel>{t("about")}</IonLabel>

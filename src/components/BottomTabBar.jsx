@@ -1,9 +1,10 @@
-import { useState } from "react";
-import { IonFooter } from "@ionic/react";
+import { useRef, useState } from "react";
+import { IonFooter, IonAlert } from "@ionic/react";
 import { useNavigate } from "react-router-dom";
 
 import { useUiLang } from "../context/UiLangContext.jsx";
 import { LEVEL_VOCABULARY, LEVEL_GRAMMAR } from "../lib/content.js";
+import { exportProgressData, importProgressData } from "../lib/storage.js";
 import { HomeIcon, BookIcon, GrammarIcon, SettingsIcon } from "./icons.jsx";
 import SettingsModal from "./SettingsModal.jsx";
 import AboutModal from "./AboutModal.jsx";
@@ -18,14 +19,62 @@ export default function BottomTabBar({ active, levelId }) {
   const navigate = useNavigate();
   const { t, isArabicUi } = useUiLang();
   const [settingsOpen, setSettingsOpen] = useState(false);
-  // Owned up here, not inside SettingsModal — Settings closes itself the instant About is
-  // picked (see SettingsModal), and IonModal drops its children while isOpen is false, so
-  // an <AboutModal> nested inside SettingsModal's own JSX would get unmounted right along
-  // with it. Keeping both as siblings, each independently controlled, avoids that.
+  // Owned up here, not inside SettingsModal — Settings closes itself the instant About/
+  // Backup/Restore is picked (see SettingsModal), and IonModal drops its children while
+  // isOpen is false, so anything nested inside SettingsModal's own JSX would get unmounted
+  // right along with it (a real bug caught with AboutModal — the hidden file input below
+  // would lose its pending file-picker interaction the same way). Keeping all of these as
+  // siblings, each independently controlled, avoids that.
   const [aboutOpen, setAboutOpen] = useState(false);
+  const fileInputRef = useRef(null);
+  const [pendingImport, setPendingImport] = useState(null);
+  const [importError, setImportError] = useState(false);
 
   const hasVocab = !!(levelId && LEVEL_VOCABULARY[levelId]);
   const hasGrammar = !!(levelId && LEVEL_GRAMMAR[levelId]);
+
+  function handleBackup() {
+    const payload = exportProgressData();
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `hamolingo-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function handleRestoreClick() {
+    fileInputRef.current?.click();
+  }
+
+  function handleFileChange(e) {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // reset so picking the same file again still fires onChange
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(reader.result);
+        if (!parsed || typeof parsed.data !== "object" || parsed.data === null) throw new Error("bad shape");
+        setPendingImport(parsed);
+      } catch {
+        setImportError(true);
+      }
+    };
+    reader.onerror = () => setImportError(true);
+    reader.readAsText(file);
+  }
+
+  function confirmRestore() {
+    if (!pendingImport) return;
+    importProgressData(pendingImport);
+    // Simplest way to get every context (theme, UI language, quiz progress, ...) back in
+    // sync with the just-restored localStorage — each was only read once at mount.
+    window.location.reload();
+  }
 
   return (
     <>
@@ -63,8 +112,34 @@ export default function BottomTabBar({ active, levelId }) {
         isOpen={settingsOpen}
         onClose={() => setSettingsOpen(false)}
         onOpenAbout={() => setAboutOpen(true)}
+        onBackup={handleBackup}
+        onRestoreClick={handleRestoreClick}
       />
       <AboutModal isOpen={aboutOpen} onClose={() => setAboutOpen(false)} />
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="application/json"
+        onChange={handleFileChange}
+        style={{ display: "none" }}
+      />
+      <IonAlert
+        isOpen={!!pendingImport}
+        onDidDismiss={() => setPendingImport(null)}
+        header={t("restoreConfirmTitle")}
+        message={t("restoreConfirmBody")}
+        buttons={[
+          { text: t("cancel"), role: "cancel" },
+          { text: t("restoreConfirmYes"), role: "destructive", handler: confirmRestore },
+        ]}
+      />
+      <IonAlert
+        isOpen={importError}
+        onDidDismiss={() => setImportError(false)}
+        header={t("restoreInvalidFile")}
+        buttons={[{ text: t("close") }]}
+      />
     </>
   );
 }

@@ -205,3 +205,43 @@ export function markGrammarTopicRead(levelId, topic) {
   read[key] = true;
   localStorage.setItem(GRAMMAR_READ_KEY, JSON.stringify(read));
 }
+
+// Manual backup/restore (Settings → Backup/Restore Progress) — a PWA install has no cloud
+// account behind it, so progress only exists in this browser's localStorage; uninstalling
+// (or losing the device) loses it for good otherwise. Sweeps every key under our own prefix
+// rather than naming each one, so a future new key is included automatically.
+const STORAGE_PREFIX = "engish-quiz-";
+
+export function exportProgressData() {
+  const data = {};
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith(STORAGE_PREFIX)) {
+        data[key] = localStorage.getItem(key);
+      }
+    }
+  } catch {
+    // ignore — worst case the backup file comes out empty
+  }
+  return {
+    app: "HamoLingo",
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    data,
+  };
+}
+
+// Throws on a malformed file so the caller can show an error — restoring is destructive
+// (overwrites existing progress), so silently no-op-ing on bad input would be worse than
+// surfacing the problem.
+export function importProgressData(payload) {
+  if (!payload || typeof payload !== "object" || !payload.data || typeof payload.data !== "object") {
+    throw new Error("Not a valid HamoLingo backup file.");
+  }
+  for (const [key, value] of Object.entries(payload.data)) {
+    if (key.startsWith(STORAGE_PREFIX) && typeof value === "string") {
+      localStorage.setItem(key, value);
+    }
+  }
+}

@@ -114,6 +114,14 @@ export const STRINGS = {
       "Vocabulary is sourced from the Oxford 3000, a research-backed list of the words English learners need most.",
     aboutDeveloper: "Developed by Arkan Yahya",
     aboutThanks: "Thanks to Mohammed Faris for helping improve the app.",
+    data: "Data",
+    backupProgress: "Backup Progress",
+    restoreProgress: "Restore Progress",
+    restoreConfirmTitle: "Restore progress?",
+    restoreConfirmBody:
+      "This will overwrite your current progress, mistakes, and settings on this device with the backup file's data.",
+    restoreConfirmYes: "Yes, Restore",
+    restoreInvalidFile: "This doesn't look like a valid HamoLingo backup file.",
   },
   ar: {
     appName: "HamoLingo",
@@ -207,5 +215,12 @@ export const STRINGS = {
       "المفردات مأخوذة من قائمة Oxford 3000، وهي قائمة مدعومة بالأبحاث لأهم الكلمات التي يحتاجها متعلمو الإنجليزية.",
     aboutDeveloper: "تم التطوير بواسطة اركان يحيى",
     aboutThanks: "شكراً لمحمد فارس لمساعدته في تطوير التطبيق.",
+    data: "البيانات",
+    backupProgress: "نسخ احتياطي للتقدم",
+    restoreProgress: "استعادة التقدم",
+    restoreConfirmTitle: "استعادة التقدم؟",
+    restoreConfirmBody: "سيؤدي هذا إلى استبدال تقدمك الحالي وأخطائك وإعداداتك على هذا الجهاز ببيانات ملف النسخ الاحتياطي.",
+    restoreConfirmYes: "نعم، استعادة",
+    restoreInvalidFile: "هذا لا يبدو ملف نسخ احتياطي صالح لتطبيق HamoLingo.",
   },
 };
