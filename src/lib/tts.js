@@ -38,6 +38,60 @@ function speakNow(text) {
   synth.speak(utterance);
 }
 
+// Diagnostic only — reachable from Settings ("Test Speaker") when debugging a device where
+// speech is silent. Runs an actual speak() attempt and reports exactly what happened
+// (whether the browser exposes the API at all, how many voices it sees, whether the engine
+// ever fired onstart/onerror, and what error code if any) as one readable block of text, so
+// a report can come back from a phone with no dev tools attached at all.
+export function diagnoseSpeech() {
+  return new Promise((resolve) => {
+    const lines = [];
+    lines.push(`userAgent: ${navigator.userAgent}`);
+    lines.push(`standalone display: ${window.matchMedia("(display-mode: standalone)").matches}`);
+    lines.push(`"speechSynthesis" in window: ${"speechSynthesis" in window}`);
+
+    if (!("speechSynthesis" in window)) {
+      lines.push("--> Speech Synthesis API isn't exposed at all in this browser.");
+      resolve(lines.join("\n"));
+      return;
+    }
+
+    const synth = window.speechSynthesis;
+    lines.push(`initial voices.length: ${synth.getVoices().length}`);
+    lines.push(`synth.speaking/pending/paused before: ${synth.speaking}/${synth.pending}/${synth.paused}`);
+    if ("userActivation" in navigator) {
+      lines.push(`navigator.userActivation.isActive: ${navigator.userActivation.isActive}`);
+    }
+
+    const finish = (outcome) => {
+      lines.push(`voices.length at finish: ${synth.getVoices().length}`);
+      lines.push(`synth.speaking/pending/paused after: ${synth.speaking}/${synth.pending}/${synth.paused}`);
+      lines.push(`OUTCOME: ${outcome}`);
+      resolve(lines.join("\n"));
+    };
+
+    let settled = false;
+    const settle = (outcome) => {
+      if (settled) return;
+      settled = true;
+      finish(outcome);
+    };
+
+    try {
+      const utterance = new SpeechSynthesisUtterance("Testing one two three.");
+      utterance.lang = "en-US";
+      utterance.onstart = () => settle("onstart fired — engine attempted playback. If you didn't hear anything, check device volume/mute/silent-switch and that a TTS voice is installed.");
+      utterance.onerror = (e) => settle(`onerror fired — error code: "${e.error}"`);
+      utterance.onend = () => settle("onend fired with no onstart/onerror first (unusual) — treated as silently completed.");
+      synth.speak(utterance);
+      lines.push("speak() called without throwing.");
+      setTimeout(() => settle("TIMEOUT after 4s — neither onstart nor onerror ever fired. The engine silently swallowed the utterance."), 4000);
+    } catch (err) {
+      settle(`speak() THREW SYNCHRONOUSLY — ${err.name}: ${err.message}`);
+    }
+  });
+}
+
 export function speak(text) {
   if (!("speechSynthesis" in window)) return;
   const synth = window.speechSynthesis;
