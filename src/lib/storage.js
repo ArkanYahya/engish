@@ -5,6 +5,7 @@
 export const THEME_KEY = "engish-quiz-theme";
 export const UI_LANG_KEY = "engish-quiz-ui-lang";
 export const SELECTED_LEVEL_KEY = "engish-quiz-selected-level";
+export const ONBOARDING_KEY = "engish-quiz-onboarding-complete";
 export const VOCAB_MISTAKES_KEY = "engish-quiz-vocab-mistakes";
 export const VOCAB_MASTERED_KEY = "engish-quiz-vocab-mastered";
 export const GRAMMAR_READ_KEY = "engish-quiz-grammar-read";
@@ -62,6 +63,22 @@ export function setSelectedLevelId(levelId) {
     localStorage.setItem(SELECTED_LEVEL_KEY, levelId);
   } catch {
     // ignore
+  }
+}
+
+export function hasCompletedOnboarding() {
+  try {
+    return localStorage.getItem(ONBOARDING_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+export function markOnboardingComplete() {
+  try {
+    localStorage.setItem(ONBOARDING_KEY, "true");
+  } catch {
+    // ignore — worst case the first-run tutorial just shows again next time
   }
 }
 
