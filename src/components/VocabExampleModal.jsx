@@ -45,9 +45,14 @@ export default function VocabExampleModal({ word, onDismiss }) {
               <IonIcon icon={volumeHighOutline} slot="icon-only" />
             </IonButton>
           </div>
-          <p dir="ltr" lang="en">
-            {displayWord.ex}
-          </p>
+          <div className="grammar-rule-row">
+            <p className="grammar-rule-en" dir="ltr" lang="en">
+              {displayWord.ex}
+            </p>
+            <IonButton fill="clear" shape="round" onClick={() => speak(displayWord.ex)} aria-label={t("listenToOption")}>
+              <IonIcon icon={volumeHighOutline} slot="icon-only" />
+            </IonButton>
+          </div>
           {revealed ? (
             <p dir="rtl" lang="ar">
               {displayWord.exAr}
