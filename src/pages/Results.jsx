@@ -1,15 +1,12 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { IonPage, IonContent, IonButton, IonAlert } from "@ionic/react";
-import { useState } from "react";
+import { IonPage, IonContent, IonButton, IonIcon, IonAlert } from "@ionic/react";
+import { closeOutline, appsOutline } from "ionicons/icons";
 
 import { useQuiz } from "../context/QuizContext.jsx";
 import { useUiLang } from "../context/UiLangContext.jsx";
 import { scoreForRange } from "../lib/quiz.js";
 import { celebrate } from "../lib/celebrate.js";
-import { LEVEL_VOCABULARY, LEVEL_GRAMMAR } from "../lib/content.js";
-import AppHeader from "../components/AppHeader.jsx";
-import QuizHeader from "../components/QuizHeader.jsx";
 import ScoreGauge from "../components/ScoreGauge.jsx";
 import StageSheet from "../components/StageSheet.jsx";
 
@@ -48,7 +45,6 @@ export default function Results() {
   if (!ready) {
     return (
       <IonPage>
-        <AppHeader />
         <IonContent className="ion-padding" />
       </IonPage>
     );
@@ -84,20 +80,23 @@ export default function Results() {
 
   return (
     <IonPage>
-      <AppHeader />
-      <IonContent className="ion-padding" {...rtlAttrs}>
-        <QuizHeader
-          levelLabel={currentLevel.label}
-          pct={pct}
-          subtitle={t("subtitleQuizComplete")}
-          onOpenStages={() => setStagesOpen(true)}
-          onOpenVocab={LEVEL_VOCABULARY[levelId] ? () => navigate(`/quiz/${levelId}/vocabulary`) : undefined}
-          onOpenGrammar={LEVEL_GRAMMAR[levelId] ? () => navigate(`/quiz/${levelId}/grammar`) : undefined}
-        />
-        <div className="quiz-card center" {...rtlAttrs}>
-          <h2>{t("quizComplete")}</h2>
+      <div className="quiz-top" {...rtlAttrs}>
+        <IonButton fill="clear" shape="round" onClick={() => navigate("/")} aria-label={t("navHome")}>
+          <IonIcon icon={closeOutline} slot="icon-only" />
+        </IonButton>
+        <p className="quiz-top-title font-display" style={{ flex: 1, textAlign: "center" }}>
+          {t("quizComplete")}
+        </p>
+        <IonButton fill="clear" shape="round" onClick={() => setStagesOpen(true)} aria-label={t("stagesTitle")}>
+          <IonIcon icon={appsOutline} slot="icon-only" />
+        </IonButton>
+      </div>
+      <IonContent {...rtlAttrs}>
+        <div className="complete-body" style={{ minHeight: "auto", paddingBottom: 8 }}>
           <ScoreGauge score={score} total={totalQuestions} size={140} />
           <p className="results-message">{t(resultsMessageKey(pct))}</p>
+        </div>
+        <div className="quiz-body" style={{ paddingTop: 0 }}>
           <div className="stage-breakdown">{stageRows}</div>
           <IonButton expand="block" onClick={() => setConfirmOpen(true)}>
             {t("takeQuizAgain")}

@@ -1,26 +1,27 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { IonPage, IonContent, IonButton } from "@ionic/react";
+import { IonPage, IonContent, IonButton, IonIcon } from "@ionic/react";
+import { arrowBackOutline } from "ionicons/icons";
 
 import { useQuiz } from "../context/QuizContext.jsx";
 import { useUiLang } from "../context/UiLangContext.jsx";
 import { scoreForRange } from "../lib/quiz.js";
-import { LEVEL_VOCABULARY, LEVEL_GRAMMAR } from "../lib/content.js";
-import AppHeader from "../components/AppHeader.jsx";
-import QuizHeader from "../components/QuizHeader.jsx";
 
 export default function StageReview() {
   const { levelId, stageIndex: stageIndexParam } = useParams();
   const stageIndex = Number(stageIndexParam);
   const navigate = useNavigate();
   const { currentLevel, state } = useQuiz();
-  const { t, rtlAttrs } = useUiLang();
+  const { t, rtlAttrs, isArabicUi } = useUiLang();
 
   const ready = currentLevel && state && currentLevel.id === levelId;
+
+  function goBack() {
+    navigate(state?.completed ? `/quiz/${levelId}/results` : `/quiz/${levelId}`);
+  }
 
   if (!ready) {
     return (
       <IonPage>
-        <AppHeader />
         <IonContent className="ion-padding" />
       </IonPage>
     );
@@ -31,8 +32,6 @@ export default function StageReview() {
   const start = stageIndex * stageSize;
   const end = start + stageSize;
   const score = scoreForRange(state, questions, start, end);
-  const answeredCount = state.answers.filter((a) => a !== null).length;
-  const pct = Math.round((answeredCount / questions.length) * 100);
 
   const items = [];
   for (let i = start; i < end; i++) {
@@ -58,25 +57,18 @@ export default function StageReview() {
 
   return (
     <IonPage>
-      <AppHeader />
-      <IonContent className="ion-padding" {...rtlAttrs}>
-        <QuizHeader
-          levelLabel={currentLevel.label}
-          pct={pct}
-          subtitle={t("subtitleReviewing", stageIndex + 1)}
-          onOpenStages={() => navigate(`/quiz/${levelId}`)}
-          onOpenVocab={LEVEL_VOCABULARY[levelId] ? () => navigate(`/quiz/${levelId}/vocabulary`) : undefined}
-          onOpenGrammar={LEVEL_GRAMMAR[levelId] ? () => navigate(`/quiz/${levelId}/grammar`) : undefined}
-        />
-        <div className="quiz-card">
-          <h2 {...rtlAttrs}>{t("stageReview", stageIndex + 1, score, stageSize)}</h2>
+      <div className="quiz-top" {...rtlAttrs}>
+        <IonButton fill="clear" shape="round" onClick={goBack} aria-label={t("back")}>
+          <IonIcon icon={arrowBackOutline} style={isArabicUi ? { transform: "scaleX(-1)" } : undefined} slot="icon-only" />
+        </IonButton>
+        <p className="quiz-top-title font-display">{t("stageReview", stageIndex + 1, score, stageSize)}</p>
+      </div>
+      <IonContent {...rtlAttrs}>
+        <div className="quiz-body">
           <div className="review-list" dir="ltr" lang="en">
             {items}
           </div>
-          <IonButton
-            expand="block"
-            onClick={() => navigate(state.completed ? `/quiz/${levelId}/results` : `/quiz/${levelId}`)}
-          >
+          <IonButton expand="block" onClick={goBack}>
             {t("back")}
           </IonButton>
         </div>

@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { IonPage, IonContent, IonButton, IonIcon } from "@ionic/react";
-import { volumeHighOutline, globeOutline } from "ionicons/icons";
+import { IonPage, IonContent, IonFooter, IonButton, IonIcon } from "@ionic/react";
+import { volumeHighOutline, globeOutline, closeOutline, appsOutline, checkmarkCircleOutline, closeCircleOutline } from "ionicons/icons";
 
 import { useQuiz } from "../context/QuizContext.jsx";
 import { useUiLang } from "../context/UiLangContext.jsx";
 import { speak } from "../lib/tts.js";
 import { stageOf } from "../lib/quiz.js";
-import { LEVEL_VOCABULARY, LEVEL_GRAMMAR } from "../lib/content.js";
-import AppHeader from "../components/AppHeader.jsx";
-import QuizHeader from "../components/QuizHeader.jsx";
 import StageSheet from "../components/StageSheet.jsx";
 import TranslationModal from "../components/TranslationModal.jsx";
 
@@ -36,7 +33,6 @@ export default function Question() {
   if (!currentLevel || !state || currentLevel.id !== levelId) {
     return (
       <IonPage>
-        <AppHeader />
         <IonContent className="ion-padding" />
       </IonPage>
     );
@@ -48,10 +44,9 @@ export default function Question() {
   const totalQuestions = questions.length;
 
   const q = questions[state.current];
-  const stageIndex = stageOf(state.current, stageSize);
-  const posInStage = (state.current % stageSize) + 1;
   const picked = state.answers[state.current];
   const isAnswered = picked !== null;
+  const isCorrect = isAnswered && picked === q.answer;
   const answeredCount = state.answers.filter((a) => a !== null).length;
   const pct = Math.round((answeredCount / totalQuestions) * 100);
 
@@ -94,27 +89,21 @@ export default function Question() {
 
   return (
     <IonPage>
-      <AppHeader />
-      <IonContent className="ion-padding" {...rtlAttrs}>
-        <QuizHeader
-          levelLabel={currentLevel.label}
-          pct={pct}
-          subtitle={t(
-            "subtitleQuestion",
-            stageIndex + 1,
-            totalStages,
-            posInStage,
-            stageSize,
-            state.current + 1,
-            totalQuestions
-          )}
-          onOpenStages={() => setStagesOpen(true)}
-          onOpenVocab={LEVEL_VOCABULARY[levelId] ? () => navigate(`/quiz/${levelId}/vocabulary`) : undefined}
-          onOpenGrammar={LEVEL_GRAMMAR[levelId] ? () => navigate(`/quiz/${levelId}/grammar`) : undefined}
-        />
+      <div className="quiz-top" {...rtlAttrs}>
+        <IonButton fill="clear" shape="round" onClick={() => navigate("/")} aria-label={t("navHome")}>
+          <IonIcon icon={closeOutline} slot="icon-only" />
+        </IonButton>
+        <div className="progress-track">
+          <div className="progress-fill" style={{ width: `${pct}%` }} />
+        </div>
+        <IonButton fill="clear" shape="round" onClick={() => setStagesOpen(true)} aria-label={t("stagesTitle")}>
+          <IonIcon icon={appsOutline} slot="icon-only" />
+        </IonButton>
+      </div>
 
-        <div className="quiz-card" dir="ltr" lang="en">
-          <p className="question-text">{q.question}</p>
+      <IonContent {...rtlAttrs}>
+        <div className="quiz-body" dir="ltr" lang="en">
+          <p className="quiz-question">{q.question}</p>
           <div className="question-actions">
             <IonButton fill="clear" shape="round" onClick={() => speak(q.question)} aria-label={t("listenToQuestion")}>
               <IonIcon icon={volumeHighOutline} slot="icon-only" />
@@ -148,22 +137,28 @@ export default function Question() {
               </div>
             );
           })}
-
-          {isAnswered && (
-            <div className={`feedback ${picked === q.answer ? "feedback-correct" : "feedback-incorrect"}`}>
-              <strong {...rtlAttrs}>{picked === q.answer ? t("correct") : t("notQuite")}</strong>
-              <p>{q.explanation}</p>
-              <p className="feedback-ar" dir="rtl" lang="ar">
-                {q.explanationAr}
-              </p>
-            </div>
-          )}
-
-          <IonButton expand="block" disabled={!isAnswered} onClick={goNext}>
-            {state.current === totalQuestions - 1 ? t("finish") : t("next")}
-          </IonButton>
         </div>
       </IonContent>
+
+      {isAnswered && (
+        <IonFooter>
+          <div className={`feedback-band ${isCorrect ? "" : "wrong"}`} {...rtlAttrs}>
+            <p className="feedback-title">
+              <IonIcon icon={isCorrect ? checkmarkCircleOutline : closeCircleOutline} />
+              {isCorrect ? t("correct") : t("notQuite")}
+            </p>
+            <p className="feedback-en" dir="ltr" lang="en">
+              {q.explanation}
+            </p>
+            <p className="feedback-ar-line" dir="rtl" lang="ar">
+              {q.explanationAr}
+            </p>
+            <IonButton expand="block" onClick={goNext}>
+              {state.current === totalQuestions - 1 ? t("finish") : t("next")}
+            </IonButton>
+          </div>
+        </IonFooter>
+      )}
 
       <StageSheet
         isOpen={stagesOpen}

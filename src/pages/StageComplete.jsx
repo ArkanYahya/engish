@@ -6,9 +6,6 @@ import { useQuiz } from "../context/QuizContext.jsx";
 import { useUiLang } from "../context/UiLangContext.jsx";
 import { scoreForRange } from "../lib/quiz.js";
 import { celebrate } from "../lib/celebrate.js";
-import { LEVEL_VOCABULARY, LEVEL_GRAMMAR } from "../lib/content.js";
-import AppHeader from "../components/AppHeader.jsx";
-import QuizHeader from "../components/QuizHeader.jsx";
 import ScoreGauge from "../components/ScoreGauge.jsx";
 
 export default function StageComplete() {
@@ -37,30 +34,21 @@ export default function StageComplete() {
   if (!ready) {
     return (
       <IonPage>
-        <AppHeader />
         <IonContent className="ion-padding" />
       </IonPage>
     );
   }
 
-  const answeredCount = state.answers.filter((a) => a !== null).length;
-  const pct = Math.round((answeredCount / currentLevel.questions.length) * 100);
-
   return (
     <IonPage>
-      <AppHeader />
-      <IonContent className="ion-padding" {...rtlAttrs}>
-        <QuizHeader
-          levelLabel={currentLevel.label}
-          pct={pct}
-          subtitle={t("subtitleStageComplete", stageIndex + 1, totalStages)}
-          onOpenStages={() => navigate(`/quiz/${levelId}`)}
-          onOpenVocab={LEVEL_VOCABULARY[levelId] ? () => navigate(`/quiz/${levelId}/vocabulary`) : undefined}
-          onOpenGrammar={LEVEL_GRAMMAR[levelId] ? () => navigate(`/quiz/${levelId}/grammar`) : undefined}
-        />
-        <div className="quiz-card center" {...rtlAttrs}>
-          <h2>{t("stageComplete", stageIndex + 1)}</h2>
-          <ScoreGauge score={score} total={stageSize} size={100} />
+      <IonContent {...rtlAttrs}>
+        <div className="complete-body">
+          <span className="deco-dot" style={{ left: "18%", top: "12%", background: "var(--coral)", transform: "rotate(18deg)" }} />
+          <span className="deco-dot" style={{ left: "76%", top: "9%", background: "var(--indigo)", transform: "rotate(-24deg)" }} />
+          <span className="deco-dot" style={{ left: "10%", top: "30%", background: "var(--amber)", transform: "rotate(8deg)" }} />
+          <span className="deco-dot" style={{ left: "84%", top: "26%", background: "var(--leaf)", transform: "rotate(-10deg)" }} />
+          <h2 className="complete-title">{t("stageComplete", stageIndex + 1)}</h2>
+          <ScoreGauge score={score} total={stageSize} size={140} />
           <IonButton expand="block" onClick={() => navigate(`/quiz/${levelId}`)}>
             {stageIndex + 1 < totalStages ? t("continueToStage", stageIndex + 2) : t("viewFinalResults")}
           </IonButton>

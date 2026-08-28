@@ -29,61 +29,6 @@
   font-family: "Segoe UI", Tahoma, Arial, sans-serif;
 }
 
-.quiz-header-block {
-  background: var(--card-bg);
-  border-radius: 12px;
-  padding: 14px 16px;
-  margin-bottom: 16px;
-}
-
-.quiz-header-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.quiz-header-tap {
-  cursor: pointer;
-}
-
-.quiz-header-links {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.link-btn {
-  background: none;
-  border: none;
-  color: var(--ion-color-primary);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0;
-}
-
-.quiz-header-subtitle-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.quiz-header-subtitle {
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.quiz-header-chevron {
-  color: var(--text-tertiary);
-  flex-shrink: 0;
-}
-
-[dir="rtl"] .quiz-header-chevron {
-  transform: scaleX(-1);
-}
 
 .quiz-card {
   background: var(--card-bg);
@@ -95,10 +40,49 @@
   text-align: center;
 }
 
-.question-text {
+/* ---------- Focused quiz flow (Question) ---------- */
+/* No persistent brand/settings toolbar here — a lesson is a focused task, not a browsing
+   screen, so the only chrome is "leave" + "how far along" + (still worth keeping) a way to
+   jump to a completed stage's review without leaving first. */
+.quiz-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px 6px;
+}
+
+.quiz-top-title {
+  font-size: 16px;
+  margin: 0;
+  color: var(--ink);
+}
+
+.progress-track {
+  flex: 1;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--indigo);
+  transition: width 0.3s ease;
+}
+
+.quiz-body {
+  padding: 18px 16px 24px;
+}
+
+.quiz-question {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 1.32;
   margin: 0 0 14px;
-  font-size: 19px;
-  line-height: 1.4;
+  color: var(--ink);
 }
 
 .question-actions {
@@ -106,6 +90,54 @@
   align-items: center;
   gap: 8px;
   margin-bottom: 18px;
+}
+
+.option-row ion-button {
+  --border-radius: 18px;
+  font-weight: 700;
+  font-size: 15.5px;
+}
+
+.feedback-band {
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+  background: var(--leaf-soft);
+}
+
+.feedback-band.wrong {
+  background: var(--coral-soft);
+}
+
+.feedback-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--leaf);
+  margin: 0 0 6px;
+}
+
+.feedback-band.wrong .feedback-title {
+  color: var(--coral);
+}
+
+.feedback-title svg {
+  width: 19px;
+  height: 19px;
+}
+
+.feedback-en {
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin: 0 0 3px;
+}
+
+.feedback-ar-line {
+  font-family: var(--font-ar);
+  font-size: 13px;
+  color: var(--ink-faint);
+  margin: 0 0 16px;
 }
 
 .option-row {
@@ -480,6 +512,30 @@
   font-size: 12px;
   color: var(--text-secondary);
   margin-top: 2px;
+}
+
+/* ---------- Celebration screens (stage complete) ---------- */
+.complete-body {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px 24px 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.deco-dot {
+  position: absolute;
+  width: 8px;
+  height: 14px;
+  border-radius: 2px;
+}
+
+.complete-title {
+  margin: 0 0 18px;
 }
 
 .sidebar-summary {
