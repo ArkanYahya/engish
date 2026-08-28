@@ -1,6 +1,6 @@
 {
-  "name": "English Quiz",
-  "short_name": "Eng Quiz",
+  "name": "HamoLingo",
+  "short_name": "HamoLingo",
   "description": "A1-B2 English quiz with bilingual English/Arabic explanations.",
   "start_url": "/",
   "scope": "/",

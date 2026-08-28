@@ -1,16 +1,5 @@
 import { useState } from "react";
-import {
-  IonHeader,
-  IonToolbar,
-  IonButtons,
-  IonButton,
-  IonIcon,
-  IonModal,
-  IonTitle,
-  IonContent,
-  IonItem,
-  IonLabel,
-} from "@ionic/react";
+import { IonHeader, IonToolbar, IonButtons, IonButton, IonIcon, IonModal, IonTitle, IonItem, IonLabel } from "@ionic/react";
 import { moonOutline, sunnyOutline, settingsOutline, closeOutline } from "ionicons/icons";
 import { useNavigate } from "react-router-dom";
 
@@ -44,12 +33,7 @@ export default function AppHeader() {
         </IonToolbar>
       </IonHeader>
 
-      <IonModal
-        isOpen={settingsOpen}
-        onDidDismiss={() => setSettingsOpen(false)}
-        initialBreakpoint={0.35}
-        breakpoints={[0, 0.35]}
-      >
+      <IonModal isOpen={settingsOpen} onDidDismiss={() => setSettingsOpen(false)} className="popup-modal">
         <IonHeader>
           <IonToolbar {...rtlAttrs}>
             <IonTitle>{t("settings")}</IonTitle>
@@ -60,12 +44,12 @@ export default function AppHeader() {
             </IonButtons>
           </IonToolbar>
         </IonHeader>
-        <IonContent {...rtlAttrs}>
-          <IonItem button onClick={toggleUiLang}>
+        <div {...rtlAttrs}>
+          <IonItem button onClick={toggleUiLang} lines="none">
             <IonLabel>{t("language")}</IonLabel>
             <IonLabel slot="end">{t("switchUiLang")}</IonLabel>
           </IonItem>
-        </IonContent>
+        </div>
       </IonModal>
     </>
   );

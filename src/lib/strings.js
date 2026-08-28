@@ -23,7 +23,7 @@ export const LEVEL_TRANSLATIONS = {
 
 export const STRINGS = {
   en: {
-    appName: "English Quiz",
+    appName: "HamoLingo",
     settings: "Settings",
     language: "Language",
     cancel: "Cancel",
@@ -89,7 +89,7 @@ export const STRINGS = {
     confirmStartOver: "Start over? This will erase your saved progress for this level.",
   },
   ar: {
-    appName: "اختبار الإنجليزية",
+    appName: "HamoLingo",
     settings: "الإعدادات",
     language: "اللغة",
     cancel: "إلغاء",

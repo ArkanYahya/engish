@@ -1,4 +1,4 @@
-import { IonModal, IonHeader, IonToolbar, IonButtons, IonButton, IonIcon, IonContent } from "@ionic/react";
+import { IonModal, IonHeader, IonToolbar, IonButtons, IonButton, IonIcon } from "@ionic/react";
 import { closeOutline } from "ionicons/icons";
 import { useUiLang } from "../context/UiLangContext.jsx";
 
@@ -6,7 +6,7 @@ export default function TranslationModal({ isOpen, onClose, questionEn, question
   const { t } = useUiLang();
 
   return (
-    <IonModal isOpen={isOpen} onDidDismiss={onClose} initialBreakpoint={0.4} breakpoints={[0, 0.4, 0.6]}>
+    <IonModal isOpen={isOpen} onDidDismiss={onClose} className="popup-modal">
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="end">
@@ -16,7 +16,7 @@ export default function TranslationModal({ isOpen, onClose, questionEn, question
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding">
+      <div className="ion-padding">
         <p className="modal-label">English</p>
         <p>{questionEn}</p>
         <p className="modal-label" dir="rtl">
@@ -25,7 +25,7 @@ export default function TranslationModal({ isOpen, onClose, questionEn, question
         <p dir="rtl" lang="ar">
           {questionAr}
         </p>
-      </IonContent>
+      </div>
     </IonModal>
   );
 }
