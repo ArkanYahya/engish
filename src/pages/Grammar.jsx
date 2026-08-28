@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { IonPage, IonContent, IonList, IonItem, IonLabel, IonBackButton, IonButtons, IonHeader, IonToolbar } from "@ionic/react";
+import { IonPage, IonContent, IonList, IonItem, IonLabel } from "@ionic/react";
 
 import { useUiLang } from "../context/UiLangContext.jsx";
 import { getLevel } from "../levels/index.js";
@@ -33,13 +33,6 @@ export default function Grammar() {
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar {...rtlAttrs}>
-          <IonButtons slot="start">
-            <IonBackButton defaultHref={`/quiz/${levelId}`} text="" />
-          </IonButtons>
-        </IonToolbar>
-      </IonHeader>
       <IonContent {...rtlAttrs}>
         <div className="ion-padding-horizontal ion-padding-top">
           <h1 className="ref-page-title">{t("grammarTitle", levelLabel)}</h1>

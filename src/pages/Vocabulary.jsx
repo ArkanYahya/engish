@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { IonPage, IonContent, IonList, IonItemDivider, IonItem, IonLabel, IonButton, IonIcon, IonBackButton, IonButtons, IonHeader, IonToolbar } from "@ionic/react";
+import { IonPage, IonContent, IonList, IonItemDivider, IonItem, IonLabel, IonButton, IonIcon } from "@ionic/react";
 import { volumeHighOutline } from "ionicons/icons";
 
 import { useUiLang } from "../context/UiLangContext.jsx";
@@ -45,13 +45,6 @@ export default function Vocabulary() {
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar {...rtlAttrs}>
-          <IonButtons slot="start">
-            <IonBackButton defaultHref={`/quiz/${levelId}`} text="" />
-          </IonButtons>
-        </IonToolbar>
-      </IonHeader>
       <IonContent {...rtlAttrs}>
         <div className="ion-padding-horizontal ion-padding-top">
           <h1 className="ref-page-title">{t("vocabularyTitle", levelLabel)}</h1>
