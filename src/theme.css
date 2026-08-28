@@ -1,53 +1,214 @@
-/* Bridges our existing brand palette into Ionic's own CSS-variable system, so Ionic's
-   built-in components (IonButton, IonCard, IonToolbar, ...) match the app's established
-   look instead of Ionic's stock blue. Dark mode is driven the same way it always was
-   (data-theme attribute + prefers-color-scheme fallback) — ThemeContext keeps
-   .ion-palette-dark on <html> in step with it. */
+/* Design tokens for the HamoLingo redesign (see the approved mockup) — warm paper ground,
+   indigo + coral as the two accents, a rounded/friendly type pairing. Everything here feeds
+   both our own custom classes (quiz.css) and Ionic's own CSS-variable system, so built-in
+   Ionic components (IonButton, IonCard, IonToolbar, IonTabBar, ...) pick it up automatically
+   instead of Ionic's stock blue. Dark mode is driven the same way it always was (data-theme
+   attribute + prefers-color-scheme fallback) — ThemeContext keeps .ion-palette-dark on <html>
+   in step with it. */
 
 :root {
-  --ion-color-primary: #6366f1;
-  --ion-color-primary-rgb: 99, 102, 241;
-  --ion-color-primary-contrast: #ffffff;
-  --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: #4f46e5;
-  --ion-color-primary-tint: #818cf8;
+  /* surfaces */
+  --paper: #faf6ef;
+  --paper-raised: #ffffff;
+  --surface-subtle: #f3ede1;
+  --line: #ebe4d8;
+  --line-strong: #ddd3c2;
 
-  --ion-background-color: #f4f5f7;
-  --ion-text-color: #1f2933;
-  --ion-toolbar-background: #ffffff;
-  --ion-item-background: #ffffff;
-  --ion-card-background: #ffffff;
+  /* ink */
+  --ink: #221f36;
+  --ink-soft: #625d78;
+  --ink-faint: #a29cb8;
+
+  /* brand */
+  --indigo: #5a4fcf;
+  --indigo-shade: #4238ad;
+  --indigo-tint: #8079db;
+  --indigo-soft: #eeecfc;
+  --indigo-ink: #ffffff;
+
+  --coral: #ff6b4a;
+  --coral-shade: #e05636;
+  --coral-tint: #ff8b71;
+  --coral-soft: #fdece6;
+  --coral-ink: #ffffff;
+
+  --leaf: #2fb673;
+  --leaf-shade: #23945c;
+  --leaf-tint: #4bd393;
+  --leaf-soft: #e3f6ec;
+  --leaf-ink: #ffffff;
+
+  --amber: #f2a93b;
+  --amber-ink: #3a2c05;
+
+  --info: #4a90e2;
+  --info-soft: #e8f1fc;
+
+  --locked-bg: #f3ede1;
+  --locked-text: #a29cb8;
+  --locked-dot: #ddd3c2;
+
+  --shadow-color: 34, 31, 54;
+  --shadow-sheet: 0 -8px 24px rgba(34, 31, 54, 0.12);
+
+  --font-display: "Fredoka", "Segoe UI", sans-serif;
+  --font-body: "Nunito Sans", "Segoe UI", sans-serif;
+  --font-ar: "Almarai", "Segoe UI", sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --ion-background-color: #0f1115;
-    --ion-text-color: #f1f2f4;
-    --ion-toolbar-background: #1a1d24;
-    --ion-item-background: #1a1d24;
-    --ion-card-background: #1a1d24;
+    --paper: #17151f;
+    --paper-raised: #201d2c;
+    --surface-subtle: #262332;
+    --line: #322d44;
+    --line-strong: #3d3752;
+
+    --ink: #f4f1fa;
+    --ink-soft: #b6b0cc;
+    --ink-faint: #726d8c;
+
+    --indigo: #8b81ff;
+    --indigo-shade: #6f66e0;
+    --indigo-tint: #a79eff;
+    --indigo-soft: #2a2650;
+    --indigo-ink: #17151f;
+
+    --coral: #ff8c6e;
+    --coral-shade: #e06f52;
+    --coral-tint: #ffab92;
+    --coral-soft: #3d2721;
+    --coral-ink: #17151f;
+
+    --leaf: #4bd393;
+    --leaf-shade: #34b378;
+    --leaf-tint: #6fe0ac;
+    --leaf-soft: #123626;
+    --leaf-ink: #0c1f16;
+
+    --amber: #f6bb5c;
+    --amber-ink: #3a2c05;
+
+    --info: #6fa8f0;
+    --info-soft: #1c2c40;
+
+    --locked-bg: #262332;
+    --locked-text: #726d8c;
+    --locked-dot: #3d3752;
+
+    --shadow-color: 0, 0, 0;
+    --shadow-sheet: 0 -8px 24px rgba(0, 0, 0, 0.5);
   }
 }
 
 :root[data-theme="dark"] {
-  --ion-background-color: #0f1115;
-  --ion-text-color: #f1f2f4;
-  --ion-toolbar-background: #1a1d24;
-  --ion-item-background: #1a1d24;
-  --ion-card-background: #1a1d24;
+  --paper: #17151f;
+  --paper-raised: #201d2c;
+  --surface-subtle: #262332;
+  --line: #322d44;
+  --line-strong: #3d3752;
+
+  --ink: #f4f1fa;
+  --ink-soft: #b6b0cc;
+  --ink-faint: #726d8c;
+
+  --indigo: #8b81ff;
+  --indigo-shade: #6f66e0;
+  --indigo-tint: #a79eff;
+  --indigo-soft: #2a2650;
+  --indigo-ink: #17151f;
+
+  --coral: #ff8c6e;
+  --coral-shade: #e06f52;
+  --coral-tint: #ffab92;
+  --coral-soft: #3d2721;
+  --coral-ink: #17151f;
+
+  --leaf: #4bd393;
+  --leaf-shade: #34b378;
+  --leaf-tint: #6fe0ac;
+  --leaf-soft: #123626;
+  --leaf-ink: #0c1f16;
+
+  --amber: #f6bb5c;
+  --amber-ink: #3a2c05;
+
+  --info: #6fa8f0;
+  --info-soft: #1c2c40;
+
+  --locked-bg: #262332;
+  --locked-text: #726d8c;
+  --locked-dot: #3d3752;
+
+  --shadow-color: 0, 0, 0;
+  --shadow-sheet: 0 -8px 24px rgba(0, 0, 0, 0.5);
 }
 
-/* Ionic's Material-Design default is all-caps button text — it's what was garbling
-   "HamoLingo" into "HAMOLINGO", and generally hurts readability on anything longer than a
-   short label (quiz options, sentences). Real casing everywhere instead. */
+/* ---- Bridge into Ionic's own component variables ---- */
+:root {
+  --ion-font-family: var(--font-body);
+  --ion-background-color: var(--paper);
+  --ion-text-color: var(--ink);
+  --ion-toolbar-background: var(--paper-raised);
+  --ion-item-background: var(--paper-raised);
+  --ion-card-background: var(--paper-raised);
+  --ion-border-color: var(--line);
+
+  --ion-color-primary: var(--indigo);
+  --ion-color-primary-rgb: 90, 79, 207;
+  --ion-color-primary-contrast: var(--indigo-ink);
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: var(--indigo-shade);
+  --ion-color-primary-tint: var(--indigo-tint);
+
+  --ion-color-success: var(--leaf);
+  --ion-color-success-rgb: 47, 182, 115;
+  --ion-color-success-contrast: var(--leaf-ink);
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: var(--leaf-shade);
+  --ion-color-success-tint: var(--leaf-tint);
+
+  --ion-color-danger: var(--coral);
+  --ion-color-danger-rgb: 255, 107, 74;
+  --ion-color-danger-contrast: var(--coral-ink);
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: var(--coral-shade);
+  --ion-color-danger-tint: var(--coral-tint);
+
+  --ion-color-medium: var(--ink-faint);
+  --ion-color-medium-rgb: 162, 156, 184;
+  --ion-color-medium-contrast: var(--paper-raised);
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: var(--ink-soft);
+  --ion-color-medium-tint: var(--ink-faint);
+}
+
+body {
+  font-family: var(--font-body);
+}
+
+h1, h2, h3,
+ion-title,
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+[lang="ar"] {
+  font-family: var(--font-ar);
+}
+
+/* Ionic's Material-Design default is all-caps button text — hurts readability on anything
+   longer than a short label (quiz options, sentences, the app name). Real casing everywhere. */
 ion-button {
   text-transform: none;
+  --border-radius: 14px;
 }
 
 .level-progress {
   font-size: 12px;
-  font-weight: 600;
-  color: var(--ion-color-primary);
+  font-weight: 700;
+  color: var(--indigo);
 }
 
 /* A centered "popup" dialog instead of Ionic's default sheet/full-screen presentation —
@@ -59,6 +220,6 @@ ion-button {
   --max-width: 420px;
   --height: auto;
   --max-height: 80vh;
-  --border-radius: 16px;
-  --box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+  --border-radius: 20px;
+  --box-shadow: 0 20px 45px -12px rgba(var(--shadow-color), 0.35);
 }

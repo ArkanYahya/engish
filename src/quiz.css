@@ -1,92 +1,28 @@
-/* Custom palette for pieces Ionic has no built-in equivalent for (score gauge, confetti,
-   the calendar-style stage grid, the correct/incorrect feedback box) — ported verbatim
-   from the vanilla version. Everything that DOES have a native Ionic component (buttons,
-   progress bar, lists, toolbars) now uses that instead of this custom CSS; see theme.css
-   for how the brand color feeds Ionic's own --ion-color-primary etc. */
+/* Aliases onto the token set in theme.css, so every rule below (ported from the earlier,
+   plainer skin) picks up the HamoLingo palette without needing each one rewritten. New
+   component work should reach for the theme.css names directly instead of adding to this
+   list. Locked/star tokens live in theme.css already; --shadow-sheet does too. */
 :root {
-  --card-bg: #ffffff;
-  --card-bg-subtle: #fafafa;
-  --text-primary: #1f2933;
-  --text-secondary: #6b7280;
-  --text-tertiary: #9ca3af;
-  --text-strong-muted: #374151;
-  --border: #e5e7eb;
-  --border-strong: #d1d5db;
+  --card-bg: var(--paper-raised);
+  --card-bg-subtle: var(--surface-subtle);
+  --text-primary: var(--ink);
+  --text-secondary: var(--ink-soft);
+  --text-tertiary: var(--ink-faint);
+  --text-strong-muted: var(--ink-soft);
+  --border: var(--line);
+  --border-strong: var(--line-strong);
 
-  --success-bg: #f0fdf4;
-  --success-border: #22c55e;
-  --success-border-soft: #bbf7d0;
-  --success-text: #166534;
+  --success-bg: var(--leaf-soft);
+  --success-border: var(--leaf);
+  --success-border-soft: var(--leaf);
+  --success-text: var(--leaf);
 
-  --danger-bg: #fef2f2;
-  --danger-border: #ef4444;
-  --danger-border-soft: #fecaca;
-  --danger-text: #991b1b;
+  --danger-bg: var(--coral-soft);
+  --danger-border: var(--coral);
+  --danger-border-soft: var(--coral);
+  --danger-text: var(--coral);
 
-  --locked-bg: #f3f4f6;
-  --locked-text: #9ca3af;
-  --locked-dot: #d1d5db;
-  --star: #eab308;
-
-  --shadow-sheet: 0 -8px 24px rgba(0, 0, 0, 0.18);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --card-bg: #1a1d24;
-    --card-bg-subtle: #20232b;
-    --text-primary: #f1f2f4;
-    --text-secondary: #9aa1ac;
-    --text-tertiary: #6b7280;
-    --text-strong-muted: #cbd2db;
-    --border: #2d313b;
-    --border-strong: #3a3f4b;
-
-    --success-bg: rgba(34, 197, 94, 0.12);
-    --success-border: #4ade80;
-    --success-border-soft: rgba(74, 222, 128, 0.35);
-    --success-text: #86efac;
-
-    --danger-bg: rgba(239, 68, 68, 0.12);
-    --danger-border: #f87171;
-    --danger-border-soft: rgba(248, 113, 113, 0.35);
-    --danger-text: #fca5a5;
-
-    --locked-bg: #20232b;
-    --locked-text: #6b7280;
-    --locked-dot: #3a3f4b;
-    --star: #facc15;
-
-    --shadow-sheet: 0 -8px 24px rgba(0, 0, 0, 0.55);
-  }
-}
-
-:root[data-theme="dark"] {
-  --card-bg: #1a1d24;
-  --card-bg-subtle: #20232b;
-  --text-primary: #f1f2f4;
-  --text-secondary: #9aa1ac;
-  --text-tertiary: #6b7280;
-  --text-strong-muted: #cbd2db;
-  --border: #2d313b;
-  --border-strong: #3a3f4b;
-
-  --success-bg: rgba(34, 197, 94, 0.12);
-  --success-border: #4ade80;
-  --success-border-soft: rgba(74, 222, 128, 0.35);
-  --success-text: #86efac;
-
-  --danger-bg: rgba(239, 68, 68, 0.12);
-  --danger-border: #f87171;
-  --danger-border-soft: rgba(248, 113, 113, 0.35);
-  --danger-text: #fca5a5;
-
-  --locked-bg: #20232b;
-  --locked-text: #6b7280;
-  --locked-dot: #3a3f4b;
-  --star: #facc15;
-
-  --shadow-sheet: 0 -8px 24px rgba(0, 0, 0, 0.55);
+  --star: var(--amber);
 }
 
 [lang="ar"] {
@@ -474,17 +410,17 @@
 }
 
 .stage-box.current {
-  background: var(--ion-color-primary-tint);
-  border-color: var(--ion-color-primary);
-  color: var(--ion-color-primary-shade);
+  background: var(--indigo-soft);
+  border-color: var(--indigo);
+  color: var(--indigo-shade);
   cursor: pointer;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--indigo) 25%, transparent);
 }
 
 .stage-box.completed {
-  background: rgba(96, 165, 250, 0.15);
-  border-color: rgba(96, 165, 250, 0.5);
-  color: #1d4ed8;
+  background: var(--info-soft);
+  border-color: var(--info);
+  color: var(--info);
   cursor: pointer;
 }
 
@@ -526,15 +462,15 @@
 }
 
 .dot.current {
-  background: var(--ion-color-primary);
+  background: var(--indigo);
 }
 
 .dot.completed {
-  background: #60a5fa;
+  background: var(--info);
 }
 
 .dot.perfect {
-  background: #4ade80;
+  background: var(--leaf);
 }
 
 .dot.locked {
