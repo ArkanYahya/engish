@@ -6,15 +6,19 @@ import { speak } from "../lib/tts.js";
 import { bumpVocabMistake } from "../lib/storage.js";
 import { pickVocabQuizQuestion } from "../lib/vocabQuiz.js";
 
-export default function VocabQuizModal({ isOpen, onDismiss, vocabulary }) {
+// Shared by both "Quiz Me" (current level only) and "Review Mistakes" (every mistaken
+// word across all levels) — the only difference is which word pools the caller passes in.
+// `targetWords` is drawn from for the question itself; `distractorWords` (defaults to the
+// same pool) supplies the wrong options, so a small target pool still gets good distractors.
+export default function VocabQuizModal({ isOpen, onDismiss, targetWords, distractorWords, title }) {
   const { t, rtlAttrs } = useUiLang();
   const [current, setCurrent] = useState(null);
   const [score, setScore] = useState(0);
   const [total, setTotal] = useState(0);
 
   useEffect(() => {
-    if (isOpen) {
-      setCurrent(pickVocabQuizQuestion(vocabulary));
+    if (isOpen && targetWords.length > 0) {
+      setCurrent(pickVocabQuizQuestion(targetWords, distractorWords));
       setScore(0);
       setTotal(0);
     }
@@ -41,7 +45,7 @@ export default function VocabQuizModal({ isOpen, onDismiss, vocabulary }) {
     <IonModal isOpen={isOpen} onDidDismiss={onDismiss} initialBreakpoint={0.65} breakpoints={[0, 0.65, 0.95]}>
       <IonHeader>
         <IonToolbar {...rtlAttrs}>
-          <IonTitle>{t("quizMe")}</IonTitle>
+          <IonTitle>{title ?? t("quizMe")}</IonTitle>
           <IonButtons slot="end">
             <IonButton onClick={onDismiss} aria-label={t("close")}>
               <IonIcon icon={closeOutline} slot="icon-only" />
@@ -95,7 +99,7 @@ export default function VocabQuizModal({ isOpen, onDismiss, vocabulary }) {
           <IonButton
             expand="block"
             disabled={!answered}
-            onClick={() => setCurrent(pickVocabQuizQuestion(vocabulary))}
+            onClick={() => setCurrent(pickVocabQuizQuestion(targetWords, distractorWords))}
           >
             {t("vocabQuizNext")}
           </IonButton>

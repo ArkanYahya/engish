@@ -7,6 +7,7 @@ import { useUiLang } from "../context/UiLangContext.jsx";
 import { getLevel } from "../levels/index.js";
 import { LEVEL_VOCABULARY } from "../lib/content.js";
 import { getVocabMistakeCount, isVocabWordRead, markVocabWordRead } from "../lib/storage.js";
+import { getAllVocabWords, getAllVocabularyAcrossLevels, getMistakenWords } from "../lib/vocabQuiz.js";
 import { speak } from "../lib/tts.js";
 import BottomTabBar from "../components/BottomTabBar.jsx";
 import LevelPills from "../components/LevelPills.jsx";
@@ -17,7 +18,10 @@ export default function Vocabulary() {
   const { levelId } = useParams();
   const { t, isArabicUi, rtlAttrs } = useUiLang();
   const [activeWord, setActiveWord] = useState(null);
-  const [quizOpen, setQuizOpen] = useState(false);
+  // null | "level" | "mistakes" — one modal instance serves both "Quiz Me" (this level's
+  // words) and "Review Mistakes" (every mistaken word across every level, since mistakes
+  // are stored level-agnostically — see lib/vocabQuiz.js).
+  const [quizMode, setQuizMode] = useState(null);
   // Forces a re-read of mistake counts (localStorage, not React state) after the example
   // modal or quiz modal changes them, so badges stay current without a full page reload.
   const [refreshKey, setRefreshKey] = useState(0);
@@ -27,6 +31,7 @@ export default function Vocabulary() {
   // level is "active" for the quiz. See components/LevelPills.jsx.
   const vocabulary = LEVEL_VOCABULARY[levelId] || [];
   const levelLabel = getLevel(levelId)?.label ?? levelId.toUpperCase();
+  const mistakenWords = getMistakenWords();
 
   function openExample(category, word) {
     markVocabWordRead(category, word.en);
@@ -39,7 +44,7 @@ export default function Vocabulary() {
   }
 
   function closeQuiz() {
-    setQuizOpen(false);
+    setQuizMode(null);
     setRefreshKey((k) => k + 1);
   }
 
@@ -51,9 +56,17 @@ export default function Vocabulary() {
           <p className="ref-page-subtitle">{t("vocabularySubtitle", levelLabel)}</p>
         </div>
         <LevelPills activeLevelId={levelId} basePath="vocabulary" />
-        <div className="ion-padding-horizontal">
-          <IonButton expand="block" onClick={() => setQuizOpen(true)}>
+        <div className="ion-padding-horizontal quiz-me-actions">
+          <IonButton expand="block" onClick={() => setQuizMode("level")}>
             {t("quizMe")}
+          </IonButton>
+          <IonButton
+            expand="block"
+            fill="outline"
+            disabled={mistakenWords.length === 0}
+            onClick={() => setQuizMode("mistakes")}
+          >
+            {t("reviewMistakes", mistakenWords.length)}
           </IonButton>
         </div>
 
@@ -110,7 +123,13 @@ export default function Vocabulary() {
       </IonContent>
 
       <VocabExampleModal word={activeWord} onDismiss={closeExample} />
-      <VocabQuizModal isOpen={quizOpen} onDismiss={closeQuiz} vocabulary={vocabulary} />
+      <VocabQuizModal
+        isOpen={quizMode !== null}
+        onDismiss={closeQuiz}
+        targetWords={quizMode === "mistakes" ? mistakenWords : getAllVocabWords(vocabulary)}
+        distractorWords={quizMode === "mistakes" ? getAllVocabularyAcrossLevels() : undefined}
+        title={quizMode === "mistakes" ? t("reviewMistakesTitle") : t("quizMe")}
+      />
       <BottomTabBar active="vocabulary" levelId={levelId} />
     </IonPage>
   );

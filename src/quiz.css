@@ -224,6 +224,12 @@ ion-item.read-item {
   margin: 4px 0 12px;
 }
 
+.quiz-me-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 /* Level switcher on Vocabulary/Grammar — see components/LevelPills.jsx. */
 .level-pills {
   display: flex;
