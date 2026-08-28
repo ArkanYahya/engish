@@ -25,11 +25,6 @@
   --star: var(--amber);
 }
 
-[lang="ar"] {
-  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
-}
-
-
 .quiz-card {
   background: var(--card-bg);
   border-radius: 12px;
@@ -204,7 +199,37 @@
 .ref-page-subtitle {
   font-size: 14px;
   color: var(--text-secondary);
-  margin: 4px 0 16px;
+  margin: 4px 0 12px;
+}
+
+/* Level switcher on Vocabulary/Grammar — see components/LevelPills.jsx. */
+.level-pills {
+  display: flex;
+  gap: 8px;
+  padding: 0 16px 12px;
+}
+
+.level-pill {
+  flex: 1;
+  border: none;
+  border-radius: 999px;
+  padding: 9px 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  background: var(--surface-subtle);
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease;
+}
+
+.level-pill:active {
+  transform: scale(0.96);
+}
+
+.level-pill.active {
+  background: var(--indigo);
+  color: var(--indigo-ink);
 }
 
 .grammar-rule-row,

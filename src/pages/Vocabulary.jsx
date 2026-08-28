@@ -1,21 +1,20 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
 import { IonPage, IonContent, IonList, IonItemDivider, IonItem, IonLabel, IonButton, IonIcon, IonBackButton, IonButtons, IonHeader, IonToolbar } from "@ionic/react";
 import { volumeHighOutline } from "ionicons/icons";
 
-import { useQuiz } from "../context/QuizContext.jsx";
 import { useUiLang } from "../context/UiLangContext.jsx";
+import { getLevel } from "../levels/index.js";
 import { LEVEL_VOCABULARY } from "../lib/content.js";
 import { getVocabMistakeCount } from "../lib/storage.js";
 import { speak } from "../lib/tts.js";
 import BottomTabBar from "../components/BottomTabBar.jsx";
+import LevelPills from "../components/LevelPills.jsx";
 import VocabExampleModal from "../components/VocabExampleModal.jsx";
 import VocabQuizModal from "../components/VocabQuizModal.jsx";
 
 export default function Vocabulary() {
   const { levelId } = useParams();
-  const navigate = useNavigate();
-  const { currentLevel, selectLevel } = useQuiz();
   const { t, isArabicUi, rtlAttrs } = useUiLang();
   const [activeWord, setActiveWord] = useState(null);
   const [quizOpen, setQuizOpen] = useState(false);
@@ -23,13 +22,11 @@ export default function Vocabulary() {
   // modal or quiz modal changes them, so badges stay current without a full page reload.
   const [refreshKey, setRefreshKey] = useState(0);
 
-  useEffect(() => {
-    if (!currentLevel || currentLevel.id !== levelId) selectLevel(levelId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [levelId]);
-
+  // Reads the level's static label directly, deliberately not through QuizContext — this
+  // screen just browses reference content and must not depend on (or change) whichever
+  // level is "active" for the quiz. See components/LevelPills.jsx.
   const vocabulary = LEVEL_VOCABULARY[levelId] || [];
-  const levelLabel = currentLevel?.label ?? levelId.toUpperCase();
+  const levelLabel = getLevel(levelId)?.label ?? levelId.toUpperCase();
 
   function openExample(category, word) {
     setActiveWord({ ...word, category });
@@ -58,6 +55,9 @@ export default function Vocabulary() {
         <div className="ion-padding-horizontal ion-padding-top">
           <h1 className="ref-page-title">{t("vocabularyTitle", levelLabel)}</h1>
           <p className="ref-page-subtitle">{t("vocabularySubtitle", levelLabel)}</p>
+        </div>
+        <LevelPills activeLevelId={levelId} basePath="vocabulary" />
+        <div className="ion-padding-horizontal">
           <IonButton expand="block" onClick={() => setQuizOpen(true)}>
             {t("quizMe")}
           </IonButton>
