@@ -47,8 +47,11 @@ export default function Question() {
   const picked = state.answers[state.current];
   const isAnswered = picked !== null;
   const isCorrect = isAnswered && picked === q.answer;
-  const answeredCount = state.answers.filter((a) => a !== null).length;
-  const pct = Math.round((answeredCount / totalQuestions) * 100);
+  // Progress bar reflects the current stage (n/10), not the whole level (n/50) — it should
+  // reset to empty at the start of every new stage instead of just creeping up over all 5.
+  const stageStart = stageOf(state.current, stageSize) * stageSize;
+  const answeredInStage = state.answers.slice(stageStart, stageStart + stageSize).filter((a) => a !== null).length;
+  const pct = Math.round((answeredInStage / stageSize) * 100);
 
   function pickAnswer(index) {
     if (isAnswered) return;

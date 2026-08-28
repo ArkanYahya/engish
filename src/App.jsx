@@ -13,7 +13,12 @@ import Results from "./pages/Results.jsx";
 import Vocabulary from "./pages/Vocabulary.jsx";
 import Grammar from "./pages/Grammar.jsx";
 
-setupIonicReact();
+// Force the iOS-style push/pop transition on every platform. It slides pages fully
+// off/on screen, so the outgoing page never visually overlaps the incoming one — the
+// default "md" transition cross-fades both pages in place instead, which briefly showed
+// Home's title superimposed on the quiz screen. This also matches the custom brand look
+// (not stock Material) we've built everywhere else.
+setupIonicReact({ mode: "ios" });
 
 export default function App() {
   return (
