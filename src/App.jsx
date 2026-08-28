@@ -10,6 +10,8 @@ import Question from "./pages/Question.jsx";
 import StageComplete from "./pages/StageComplete.jsx";
 import StageReview from "./pages/StageReview.jsx";
 import Results from "./pages/Results.jsx";
+import Vocabulary from "./pages/Vocabulary.jsx";
+import Grammar from "./pages/Grammar.jsx";
 
 setupIonicReact();
 
@@ -26,6 +28,8 @@ export default function App() {
                 <Route path="/quiz/:levelId/stage/:stageIndex/complete" element={<StageComplete />} />
                 <Route path="/quiz/:levelId/stage/:stageIndex/review" element={<StageReview />} />
                 <Route path="/quiz/:levelId/results" element={<Results />} />
+                <Route path="/quiz/:levelId/vocabulary" element={<Vocabulary />} />
+                <Route path="/quiz/:levelId/grammar" element={<Grammar />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </IonRouterOutlet>
             </IonReactRouter>

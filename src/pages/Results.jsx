@@ -7,6 +7,7 @@ import { useQuiz } from "../context/QuizContext.jsx";
 import { useUiLang } from "../context/UiLangContext.jsx";
 import { scoreForRange } from "../lib/quiz.js";
 import { celebrate } from "../lib/celebrate.js";
+import { LEVEL_VOCABULARY, LEVEL_GRAMMAR } from "../lib/content.js";
 import AppHeader from "../components/AppHeader.jsx";
 import QuizHeader from "../components/QuizHeader.jsx";
 import ScoreGauge from "../components/ScoreGauge.jsx";
@@ -90,6 +91,8 @@ export default function Results() {
           pct={pct}
           subtitle={t("subtitleQuizComplete")}
           onOpenStages={() => setStagesOpen(true)}
+          onOpenVocab={LEVEL_VOCABULARY[levelId] ? () => navigate(`/quiz/${levelId}/vocabulary`) : undefined}
+          onOpenGrammar={LEVEL_GRAMMAR[levelId] ? () => navigate(`/quiz/${levelId}/grammar`) : undefined}
         />
         <div className="quiz-card center" {...rtlAttrs}>
           <h2>{t("quizComplete")}</h2>

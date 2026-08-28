@@ -4,6 +4,7 @@ import { IonPage, IonContent, IonButton } from "@ionic/react";
 import { useQuiz } from "../context/QuizContext.jsx";
 import { useUiLang } from "../context/UiLangContext.jsx";
 import { scoreForRange } from "../lib/quiz.js";
+import { LEVEL_VOCABULARY, LEVEL_GRAMMAR } from "../lib/content.js";
 import AppHeader from "../components/AppHeader.jsx";
 import QuizHeader from "../components/QuizHeader.jsx";
 
@@ -64,6 +65,8 @@ export default function StageReview() {
           pct={pct}
           subtitle={t("subtitleReviewing", stageIndex + 1)}
           onOpenStages={() => navigate(`/quiz/${levelId}`)}
+          onOpenVocab={LEVEL_VOCABULARY[levelId] ? () => navigate(`/quiz/${levelId}/vocabulary`) : undefined}
+          onOpenGrammar={LEVEL_GRAMMAR[levelId] ? () => navigate(`/quiz/${levelId}/grammar`) : undefined}
         />
         <div className="quiz-card">
           <h2 {...rtlAttrs}>{t("stageReview", stageIndex + 1, score, stageSize)}</h2>

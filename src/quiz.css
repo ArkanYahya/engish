@@ -98,7 +98,6 @@
   border-radius: 12px;
   padding: 14px 16px;
   margin-bottom: 16px;
-  cursor: pointer;
 }
 
 .quiz-header-top {
@@ -106,6 +105,10 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 10px;
+}
+
+.quiz-header-tap {
+  cursor: pointer;
 }
 
 .quiz-header-links {
@@ -186,6 +189,104 @@
 .option-row ion-button,
 .quiz-card ion-button {
   text-transform: none;
+}
+
+/* Mistake badge: shows how many times a word was recently missed in "Quiz Me". Fixed,
+   theme-independent colors so severity reads the same in light and dark mode. */
+.vocab-mistake-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.vocab-mistake-badge.tier-1 {
+  background: #f59e0b;
+}
+
+.vocab-mistake-badge.tier-2 {
+  background: #f97316;
+}
+
+.vocab-mistake-badge.tier-3 {
+  background: #ef4444;
+}
+
+.vocab-en,
+.grammar-topic-en {
+  font-weight: 600;
+}
+
+.vocab-ar,
+.grammar-topic-ar {
+  color: var(--text-secondary);
+  /* Physical, not logical: the row is always LTR-ordered (word list content never mirrors
+     for Arabic UI — only chrome does), so the gap belongs on the visual left regardless of
+     this span's own dir="rtl". */
+  margin-left: 10px;
+}
+
+.ref-page-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ref-page-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 4px 0 16px;
+}
+
+.grammar-rule-row,
+.grammar-example-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.grammar-rule-en {
+  flex: 1;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.grammar-rule-ar {
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.grammar-examples-label {
+  margin: 4px 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+}
+
+.grammar-example-en {
+  flex: 1;
+  margin: 0;
+  font-size: 14px;
+}
+
+.grammar-example-ar {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
 }
 
 .modal-label {

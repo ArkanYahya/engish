@@ -7,6 +7,7 @@ import { useQuiz } from "../context/QuizContext.jsx";
 import { useUiLang } from "../context/UiLangContext.jsx";
 import { speak } from "../lib/tts.js";
 import { stageOf } from "../lib/quiz.js";
+import { LEVEL_VOCABULARY, LEVEL_GRAMMAR } from "../lib/content.js";
 import AppHeader from "../components/AppHeader.jsx";
 import QuizHeader from "../components/QuizHeader.jsx";
 import StageSheet from "../components/StageSheet.jsx";
@@ -108,6 +109,8 @@ export default function Question() {
             totalQuestions
           )}
           onOpenStages={() => setStagesOpen(true)}
+          onOpenVocab={LEVEL_VOCABULARY[levelId] ? () => navigate(`/quiz/${levelId}/vocabulary`) : undefined}
+          onOpenGrammar={LEVEL_GRAMMAR[levelId] ? () => navigate(`/quiz/${levelId}/grammar`) : undefined}
         />
 
         <div className="quiz-card" dir="ltr" lang="en">
