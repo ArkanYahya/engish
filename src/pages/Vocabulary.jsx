@@ -6,7 +6,7 @@ import { volumeHighOutline } from "ionicons/icons";
 import { useUiLang } from "../context/UiLangContext.jsx";
 import { getLevel } from "../levels/index.js";
 import { LEVEL_VOCABULARY } from "../lib/content.js";
-import { getVocabMistakeCount } from "../lib/storage.js";
+import { getVocabMistakeCount, isVocabWordRead, markVocabWordRead } from "../lib/storage.js";
 import { speak } from "../lib/tts.js";
 import BottomTabBar from "../components/BottomTabBar.jsx";
 import LevelPills from "../components/LevelPills.jsx";
@@ -29,6 +29,7 @@ export default function Vocabulary() {
   const levelLabel = getLevel(levelId)?.label ?? levelId.toUpperCase();
 
   function openExample(category, word) {
+    markVocabWordRead(category, word.en);
     setActiveWord({ ...word, category });
   }
 
@@ -70,8 +71,15 @@ export default function Vocabulary() {
               {group.words.map((w) => {
                 const missCount = getVocabMistakeCount(group.category, w.en);
                 const tier = Math.min(missCount, 3);
+                const isRead = isVocabWordRead(group.category, w.en);
                 return (
-                  <IonItem key={w.en} button detail onClick={() => openExample(group.category, w)}>
+                  <IonItem
+                    key={w.en}
+                    button
+                    detail
+                    className={isRead ? "read-item" : ""}
+                    onClick={() => openExample(group.category, w)}
+                  >
                     <IonLabel dir="ltr" lang="en">
                       <span className="vocab-en">{w.en}</span>
                       {missCount > 0 && (
