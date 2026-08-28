@@ -20,11 +20,8 @@ import "./theme.css";
 import "./quiz.css";
 import App from "./App.jsx";
 
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js").catch(() => {});
-  });
-}
+// Service worker registration is auto-injected by vite-plugin-pwa (registerType:
+// "autoUpdate") — no manual navigator.serviceWorker.register() needed here.
 
 createRoot(document.getElementById("app")).render(
   <StrictMode>
