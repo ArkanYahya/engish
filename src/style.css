@@ -1214,6 +1214,19 @@ h2 {
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--card-bg-subtle);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.vocab-row:hover,
+.vocab-row:focus-visible {
+  background: var(--card-bg-hover);
+  border-color: var(--primary);
+}
+
+.vocab-row:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .vocab-word {
@@ -1266,6 +1279,38 @@ h2 {
 
 .vocab-speak-btn {
   flex-shrink: 0;
+}
+
+.vocab-example-box {
+  text-align: center;
+}
+
+.vocab-example-word-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 4px 0 16px;
+}
+
+.vocab-example-word {
+  margin: 0;
+  font-size: 24px;
+}
+
+.vocab-example-sentence {
+  font-size: 16px;
+  margin: 0 0 16px;
+}
+
+.vocab-example-sentence-ar {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.vocab-example-reveal-btn {
+  margin: 0 auto;
 }
 
 .vocab-quiz-trigger-btn {

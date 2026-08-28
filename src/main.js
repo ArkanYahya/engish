@@ -115,6 +115,8 @@ const STRINGS = {
     vocabQuizNext: "Next Word",
     vocabQuizScore: (score, total) => `Score: ${score}/${total}`,
     missedTimes: (count) => `Missed ${count} time${count === 1 ? "" : "s"} recently`,
+    exampleSentence: "Example Sentence",
+    showTranslation: "Show Translation",
     stagesTitle: "Stages",
     stagesCompleteOf: (done, total) => `${done} / ${total} complete`,
     legendCurrent: "Current",
@@ -173,6 +175,8 @@ const STRINGS = {
     vocabQuizNext: "الكلمة التالية",
     vocabQuizScore: (score, total) => `النتيجة: ${score}/${total}`,
     missedTimes: (count) => `أخطأت بها ${count} ${count === 1 ? "مرة" : "مرات"} مؤخرًا`,
+    exampleSentence: "جملة توضيحية",
+    showTranslation: "إظهار الترجمة",
     stagesTitle: "المراحل",
     stagesCompleteOf: (done, total) => `${done} / ${total} مكتملة`,
     legendCurrent: "الحالية",
@@ -960,7 +964,7 @@ function renderVocabulary(preserveReturn = false) {
             ? `<span class="vocab-mistake-badge tier-${tier}" title="${t("missedTimes", missCount)}">${missCount}</span>`
             : "";
         return `
-          <div class="vocab-row">
+          <div class="vocab-row" data-category="${group.category}" data-en="${w.en.replace(/"/g, "&quot;")}" role="button" tabindex="0" aria-label="${t("exampleSentence")}: ${w.en}">
             <div class="vocab-word">
               <span class="vocab-en">${w.en}</span>
               ${badge}
@@ -997,10 +1001,88 @@ function renderVocabulary(preserveReturn = false) {
   });
 
   document.querySelectorAll(".vocab-speak-btn").forEach((btn) => {
-    btn.addEventListener("click", () => speak(btn.dataset.en));
+    // Stop the click from bubbling up to the row, which opens the example-sentence card —
+    // the speaker button is a separate action (just pronounce the word).
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      speak(btn.dataset.en);
+    });
+  });
+
+  document.querySelectorAll(".vocab-row").forEach((row) => {
+    const openExample = () => {
+      const word = findVocabWord(row.dataset.category, row.dataset.en);
+      if (word) openVocabExampleModal(word);
+    };
+    row.addEventListener("click", openExample);
+    row.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openExample();
+      }
+    });
   });
 
   document.querySelector(".vocab-quiz-trigger-btn").addEventListener("click", openVocabQuizModal);
+}
+
+function findVocabWord(category, en) {
+  const group = VOCABULARY.find((g) => g.category === category);
+  return group?.words.find((w) => w.en === en);
+}
+
+// Shows the word's example sentence with the Arabic translation hidden until the learner
+// asks for it, so they're nudged to try reading the English sentence first.
+function openVocabExampleModal(word) {
+  let revealed = false;
+
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  document.body.appendChild(overlay);
+
+  function close() {
+    document.removeEventListener("keydown", onKey);
+    overlay.remove();
+  }
+  function onKey(e) {
+    if (e.key === "Escape") close();
+  }
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) close();
+  });
+  document.addEventListener("keydown", onKey);
+
+  function render() {
+    overlay.innerHTML = `
+      <div class="modal-box vocab-example-box" ${rtlAttrs()}>
+        <button class="modal-close" aria-label="${t("close")}">${icon("x")}</button>
+        <p class="modal-label">${t("exampleSentence")}</p>
+        <div class="vocab-example-word-row">
+          <h2 class="vocab-example-word">${word.en}</h2>
+          <button class="icon-btn vocab-example-speak-btn" type="button" title="${t("listenToOption")}" aria-label="${t("listenToOption")}">${icon("speaker")}</button>
+        </div>
+        <p class="vocab-example-sentence" dir="ltr" lang="en">${word.ex}</p>
+        ${
+          revealed
+            ? `<p class="vocab-example-sentence-ar" dir="rtl" lang="ar">${word.exAr}</p>`
+            : `<button class="icon-btn vocab-example-reveal-btn" type="button" title="${t("showTranslation")}" aria-label="${t("showTranslation")}">${icon("globe")}</button>`
+        }
+      </div>
+    `;
+
+    overlay.querySelector(".modal-close").addEventListener("click", close);
+    overlay.querySelector(".vocab-example-speak-btn").addEventListener("click", () => speak(word.ex));
+
+    const revealBtn = overlay.querySelector(".vocab-example-reveal-btn");
+    if (revealBtn) {
+      revealBtn.addEventListener("click", () => {
+        revealed = true;
+        render();
+      });
+    }
+  }
+
+  render();
 }
 
 const ALL_VOCAB_WORDS = VOCABULARY.flatMap((group) =>
