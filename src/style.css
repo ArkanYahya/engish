@@ -275,21 +275,24 @@ body {
   margin-bottom: 12px;
 }
 
+/* Sized and spaced like a month calendar's day cells — small, tightly packed squares
+   rather than large buttons — so 50 stages read as one compact block instead of a tall
+   sprawling grid. */
 .stage-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 6px;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
   margin-bottom: 14px;
 }
 
 .stage-box {
   position: relative;
   aspect-ratio: 1;
-  border-radius: 6px;
+  border-radius: 5px;
   border: 1px solid var(--border);
   background: var(--locked-bg);
   color: var(--locked-text);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -345,8 +348,8 @@ body {
 
 .legend {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  flex-wrap: wrap;
+  gap: 6px 12px;
   font-size: 11px;
   color: var(--text-secondary);
 }
@@ -412,19 +415,20 @@ body {
   }
 
   /* The stage grid becomes a bottom-sheet on mobile instead of stacking inline —
-     it's the same .sidebar element as desktop, just repositioned and hidden until opened. */
+     it's the same .sidebar element as desktop, just repositioned and hidden until opened.
+     Inset from all four edges with rounded corners all around, so it reads as a floating
+     card sitting above the backdrop rather than a full-bleed sheet stuck to the screen. */
   .sidebar {
     position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
+    left: 12px;
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    width: auto;
     max-height: 80vh;
     overflow-y: auto;
-    border-radius: 16px 16px 0 0;
+    border-radius: 16px;
     box-shadow: var(--shadow-sheet);
-    padding-bottom: calc(16px + env(safe-area-inset-bottom));
-    transform: translateY(110%);
+    transform: translateY(calc(100% + 24px));
     transition: transform 0.25s ease;
     z-index: 1000;
   }
@@ -443,10 +447,6 @@ body {
 
   .icon-btn.sidebar-close-btn {
     display: flex;
-  }
-
-  .stage-grid {
-    grid-template-columns: repeat(6, 1fr);
   }
 
   /* On mobile the stage grid lives in a bottom-sheet rather than always being visible
