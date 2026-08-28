@@ -74,7 +74,7 @@ export default function Vocabulary() {
                     onClick={() => openExample(group.category, w)}
                     {...rtlAttrs}
                   >
-                    <IonLabel dir="ltr" lang="en">
+                    <IonLabel dir="ltr" lang="en" style={{ textAlign: isArabicUi ? "right" : "left" }}>
                       <span className="vocab-en">{w.en}</span>
                       {missCount > 0 && (
                         <span
