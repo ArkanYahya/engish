@@ -37,6 +37,13 @@
   --ion-card-background: #1a1d24;
 }
 
+/* Ionic's Material-Design default is all-caps button text — it's what was garbling
+   "HamoLingo" into "HAMOLINGO", and generally hurts readability on anything longer than a
+   short label (quiz options, sentences). Real casing everywhere instead. */
+ion-button {
+  text-transform: none;
+}
+
 .level-progress {
   font-size: 12px;
   font-weight: 600;

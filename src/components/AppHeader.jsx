@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { IonHeader, IonToolbar, IonButtons, IonButton, IonIcon, IonModal, IonTitle, IonItem, IonLabel } from "@ionic/react";
-import { moonOutline, sunnyOutline, settingsOutline, closeOutline } from "ionicons/icons";
+import { IonHeader, IonToolbar, IonButtons, IonButton, IonIcon, IonModal, IonTitle, IonItem, IonLabel, IonToggle } from "@ionic/react";
+import { settingsOutline, closeOutline } from "ionicons/icons";
 import { useNavigate } from "react-router-dom";
 
 import { useTheme } from "../context/ThemeContext.jsx";
 import { useUiLang } from "../context/UiLangContext.jsx";
 
-// The persistent top bar (brand/home, theme toggle, settings) shown identically on every
-// screen — the settings modal (currently just the UI language toggle) lives right here too
-// so every page gets it for free instead of wiring it up per page.
+// The persistent top bar (brand/home, settings) shown identically on every screen — the
+// settings popup (UI language + dark mode) lives right here too so every page gets it for
+// free instead of wiring it up per page.
 export default function AppHeader() {
   const navigate = useNavigate();
   const { isDark, toggleTheme } = useTheme();
@@ -23,9 +23,6 @@ export default function AppHeader() {
             <IonButton onClick={() => navigate("/")}>{t("appName")}</IonButton>
           </IonButtons>
           <IonButtons slot="end">
-            <IonButton onClick={toggleTheme} aria-label={isDark ? t("switchToLight") : t("switchToDark")}>
-              <IonIcon icon={isDark ? sunnyOutline : moonOutline} slot="icon-only" />
-            </IonButton>
             <IonButton onClick={() => setSettingsOpen(true)} aria-label={t("settings")}>
               <IonIcon icon={settingsOutline} slot="icon-only" />
             </IonButton>
@@ -48,6 +45,15 @@ export default function AppHeader() {
           <IonItem button onClick={toggleUiLang} lines="none">
             <IonLabel>{t("language")}</IonLabel>
             <IonLabel slot="end">{t("switchUiLang")}</IonLabel>
+          </IonItem>
+          <IonItem lines="none">
+            <IonLabel>{t("darkMode")}</IonLabel>
+            <IonToggle
+              checked={isDark}
+              onIonChange={toggleTheme}
+              slot="end"
+              aria-label={isDark ? t("switchToLight") : t("switchToDark")}
+            />
           </IonItem>
         </div>
       </IonModal>

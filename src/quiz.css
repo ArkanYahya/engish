@@ -184,13 +184,6 @@
   margin: 0;
 }
 
-/* Quiz options are content to read carefully (words/full sentences), not short button
-   labels — Ionic's default all-caps (Material Design convention) hurts readability here. */
-.option-row ion-button,
-.quiz-card ion-button {
-  text-transform: none;
-}
-
 /* Mistake badge: shows how many times a word was recently missed in "Quiz Me". Fixed,
    theme-independent colors so severity reads the same in light and dark mode. */
 .vocab-mistake-badge {
