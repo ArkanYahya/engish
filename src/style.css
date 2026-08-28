@@ -544,6 +544,16 @@ body {
   z-index: 20;
 }
 
+/* In RTL, dir="rtl" mirrors the flex row that positions .header-menu — its trigger button
+   ends up near the *left* edge of the header instead of the right. `right: 0` above is a
+   physical (non-flipping) property, so it kept anchoring the panel off the trigger's right
+   edge, which — now that the trigger itself sits near the screen's left edge — pushed the
+   panel off-screen to the left. Anchor from the opposite edge instead when RTL is active. */
+[dir="rtl"] .header-menu-panel {
+  right: auto;
+  left: 0;
+}
+
 .header-menu-panel.open {
   display: flex;
   flex-direction: column;
@@ -552,7 +562,7 @@ body {
 .header-menu-item {
   background: none;
   border: none;
-  text-align: left;
+  text-align: start;
   padding: 9px 10px;
   border-radius: 6px;
   font-size: 14px;
@@ -637,6 +647,46 @@ h2 {
 .translate-btn:hover {
   border-color: var(--primary);
   color: var(--primary-hover);
+}
+
+.lang-toggle-btn {
+  flex-shrink: 0;
+  border: 1px solid var(--border-strong);
+  background: var(--card-bg-subtle);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-strong-muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.lang-toggle-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary-hover);
+}
+
+.level-picker-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.level-picker-top h1 {
+  margin: 0 0 6px;
+}
+
+.level-picker-top .level-picker-subtitle {
+  margin: 0;
+}
+
+/* The chevron icon points "forward" (right in LTR); mirror it for RTL so it still
+   points toward reading-forward direction instead of visually pointing backward. */
+[dir="rtl"] .stage-bar-chevron .icon {
+  transform: scaleX(-1);
 }
 
 .question-actions {
@@ -752,8 +802,15 @@ h2 {
   margin-top: 8px !important;
   padding-top: 8px;
   border-top: 1px solid rgba(127, 127, 127, 0.25);
-  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
   font-size: 14px;
+}
+
+/* Applies to every Arabic-language element in the app — the bilingual explanations/modal
+   text that already existed, and the new translated UI chrome below — so Arabic always
+   renders with a face that actually covers Arabic glyphs well, instead of the Latin-first
+   system-ui stack. */
+[lang="ar"] {
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
 }
 
 .feedback-correct {
@@ -998,7 +1055,7 @@ h2 {
 }
 
 .level-card {
-  text-align: left;
+  text-align: start;
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--card-bg-subtle);

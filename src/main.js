@@ -67,11 +67,170 @@ function toggleTheme() {
 function updateThemeToggleIcon() {
   document.querySelectorAll(".theme-toggle-btn").forEach((btn) => {
     btn.innerHTML = isDarkActive() ? icon("sun") : icon("moon");
-    btn.setAttribute("aria-label", isDarkActive() ? "Switch to light mode" : "Switch to dark mode");
+    btn.setAttribute("aria-label", isDarkActive() ? t("switchToLight") : t("switchToDark"));
   });
 }
 
 applyTheme();
+
+// UI language: translates interface chrome (buttons, headers, labels) only — the quiz
+// questions/options themselves always stay in English, since that's the content being
+// learned. "ar" strings also drive dir="rtl"/lang="ar" on chrome-only containers below.
+const UI_LANG_KEY = "engish-quiz-ui-lang";
+
+const LEVEL_TRANSLATIONS = {
+  a1: {
+    en: { name: "Beginner", description: "Basic words, 'to be', simple present, everyday vocabulary." },
+    ar: { name: "مبتدئ", description: "كلمات أساسية، فعل الكينونة، المضارع البسيط، مفردات يومية." },
+  },
+  a2: {
+    en: { name: "Elementary", description: "Past simple, present continuous, comparatives, modals." },
+    ar: { name: "أساسي", description: "الماضي البسيط، المضارع المستمر، صيغ المقارنة، الأفعال الناقصة." },
+  },
+  b1: {
+    en: { name: "Intermediate", description: "Present perfect, conditionals, passive voice, phrasal verbs." },
+    ar: { name: "متوسط", description: "المضارع التام، الجمل الشرطية، المبني للمجهول، الأفعال المركبة." },
+  },
+  b2: {
+    en: { name: "Upper-Intermediate", description: "Second/third conditionals, deduction modals, collocations." },
+    ar: { name: "فوق المتوسط", description: "الشرط الثاني والثالث، أفعال الاستنتاج، المتلازمات اللفظية." },
+  },
+};
+
+const STRINGS = {
+  en: {
+    appName: "English Quiz",
+    changeLevel: "Change Level",
+    startOver: "Start Over",
+    menu: "Menu",
+    close: "Close",
+    switchToLight: "Switch to light mode",
+    switchToDark: "Switch to dark mode",
+    switchUiLang: "عربي",
+    stagesTitle: "Stages",
+    stagesCompleteOf: (done, total) => `${done} / ${total} complete`,
+    legendCurrent: "Current",
+    legendDone: "Done",
+    legendPerfect: "Perfect",
+    legendLocked: "Locked",
+    stageN: (n) => `Stage ${n}`,
+    stageTitleScore: (n, score, size) => `Stage ${n} — ${score}/${size}`,
+    stageTitleInProgress: (n, x, size) => `Stage ${n} — in progress (${x}/${size})`,
+    stageTitleLocked: (n) => `Stage ${n} — locked`,
+    stageBarLabel: (n, total, done) => `Stage ${n} of ${total} · ${done} complete`,
+    subtitleQuestion: (stage, totalStages, q, stageSize, overall, total) =>
+      `Stage ${stage} of ${totalStages} · Question ${q} of ${stageSize} · Overall ${overall}/${total}`,
+    subtitleStageComplete: (stage, total) => `Stage ${stage} of ${total} complete`,
+    subtitleReviewing: (stage) => `Reviewing Stage ${stage}`,
+    subtitleQuizComplete: "Quiz complete",
+    chooseLevel: "Choose your level",
+    chooseLevelSubtitle: "Each level has 500 questions across 50 stages, with bilingual (English/Arabic) explanations.",
+    notStarted: "Not started",
+    inProgress: (a, b) => `In progress — ${a}/${b}`,
+    completedScore: (a, b) => `Completed — ${a}/${b}`,
+    listenToQuestion: "Listen to question",
+    listenToOption: "Listen to option",
+    correct: "Correct!",
+    notQuite: "Not quite.",
+    next: "Next",
+    finish: "Finish",
+    stageComplete: (n) => `Stage ${n} Complete!`,
+    continueToStage: (n) => `Continue to Stage ${n}`,
+    viewFinalResults: "View Final Results",
+    stageReview: (n, score, size) => `Stage ${n} Review — ${score}/${size}`,
+    yourAnswer: "Your answer:",
+    correctAnswer: "Correct answer:",
+    back: "Back",
+    quizComplete: "Quiz Complete!",
+    resultOutstanding: "Outstanding work!",
+    resultGreat: "Great job!",
+    resultGood: "Good effort — keep practicing!",
+    resultKeepGoing: "Keep going, you'll get there!",
+    takeQuizAgain: "Take Quiz Again",
+    confirmStartOver: "Start over? This will erase your saved progress for this level.",
+  },
+  ar: {
+    appName: "اختبار الإنجليزية",
+    changeLevel: "تغيير المستوى",
+    startOver: "البدء من جديد",
+    menu: "القائمة",
+    close: "إغلاق",
+    switchToLight: "التبديل إلى الوضع الفاتح",
+    switchToDark: "التبديل إلى الوضع الداكن",
+    switchUiLang: "English",
+    stagesTitle: "المراحل",
+    stagesCompleteOf: (done, total) => `${done} / ${total} مكتملة`,
+    legendCurrent: "الحالية",
+    legendDone: "منتهية",
+    legendPerfect: "ممتازة",
+    legendLocked: "مغلقة",
+    stageN: (n) => `المرحلة ${n}`,
+    stageTitleScore: (n, score, size) => `المرحلة ${n} — ${score}/${size}`,
+    stageTitleInProgress: (n, x, size) => `المرحلة ${n} — قيد التقدم (${x}/${size})`,
+    stageTitleLocked: (n) => `المرحلة ${n} — مغلقة`,
+    stageBarLabel: (n, total, done) => `المرحلة ${n} من ${total} · ${done} مكتملة`,
+    subtitleQuestion: (stage, totalStages, q, stageSize, overall, total) =>
+      `المرحلة ${stage} من ${totalStages} · السؤال ${q} من ${stageSize} · الإجمالي ${overall}/${total}`,
+    subtitleStageComplete: (stage, total) => `اكتملت المرحلة ${stage} من ${total}`,
+    subtitleReviewing: (stage) => `مراجعة المرحلة ${stage}`,
+    subtitleQuizComplete: "اكتمل الاختبار",
+    chooseLevel: "اختر مستواك",
+    chooseLevelSubtitle: "يحتوي كل مستوى على 500 سؤال موزعة على 50 مرحلة، مع شروحات ثنائية اللغة (إنجليزي/عربي).",
+    notStarted: "لم يبدأ",
+    inProgress: (a, b) => `قيد التقدم — ${a}/${b}`,
+    completedScore: (a, b) => `مكتمل — ${a}/${b}`,
+    listenToQuestion: "استمع إلى السؤال",
+    listenToOption: "استمع إلى الخيار",
+    correct: "إجابة صحيحة!",
+    notQuite: "ليست صحيحة تماماً.",
+    next: "التالي",
+    finish: "إنهاء",
+    stageComplete: (n) => `اكتملت المرحلة ${n}!`,
+    continueToStage: (n) => `المتابعة إلى المرحلة ${n}`,
+    viewFinalResults: "عرض النتيجة النهائية",
+    stageReview: (n, score, size) => `مراجعة المرحلة ${n} — ${score}/${size}`,
+    yourAnswer: "إجابتك:",
+    correctAnswer: "الإجابة الصحيحة:",
+    back: "رجوع",
+    quizComplete: "اكتمل الاختبار!",
+    resultOutstanding: "أداء رائع!",
+    resultGreat: "عمل ممتاز!",
+    resultGood: "جهد جيد — واصل التدرب!",
+    resultKeepGoing: "واصل التقدم، ستصل قريباً!",
+    takeQuizAgain: "أعد الاختبار",
+    confirmStartOver: "هل تريد البدء من جديد؟ سيتم حذف تقدمك المحفوظ لهذا المستوى.",
+  },
+};
+
+let uiLang = "en";
+try {
+  uiLang = localStorage.getItem(UI_LANG_KEY) === "ar" ? "ar" : "en";
+} catch {
+  // default to "en"
+}
+
+function t(key, ...args) {
+  const entry = STRINGS[uiLang][key];
+  return typeof entry === "function" ? entry(...args) : entry;
+}
+
+function isArabicUi() {
+  return uiLang === "ar";
+}
+
+function rtlAttrs() {
+  return isArabicUi() ? 'dir="rtl" lang="ar"' : 'dir="ltr" lang="en"';
+}
+
+function toggleUiLang() {
+  uiLang = isArabicUi() ? "en" : "ar";
+  try {
+    localStorage.setItem(UI_LANG_KEY, uiLang);
+  } catch {
+    // selection just won't persist across reloads
+  }
+  rerenderCurrentScreen();
+}
 
 const SELECTED_LEVEL_KEY = "engish-quiz-selected-level";
 const progressKeyFor = (levelId) => `engish-quiz-progress-${levelId}`;
@@ -84,6 +243,29 @@ let STAGE_SIZE = 10;
 let TOTAL_STAGES = 0;
 let TOTAL_QUESTIONS = 0;
 let state = null;
+
+// Tracks which screen is currently shown so toggling UI language (which needs to
+// regenerate all text, unlike the theme toggle) can re-render the same screen in place.
+let currentView = { name: "levelPicker" };
+
+function rerenderCurrentScreen() {
+  switch (currentView.name) {
+    case "question":
+      renderQuestion();
+      break;
+    case "stageComplete":
+      renderStageComplete(currentView.stageIndex);
+      break;
+    case "stageReview":
+      renderStageReview(currentView.stageIndex);
+      break;
+    case "results":
+      renderResults();
+      break;
+    default:
+      renderLevelPicker();
+  }
+}
 
 function freshState(totalQuestions) {
   return {
@@ -139,21 +321,21 @@ function stageStatus(stageIndex) {
 
 function levelProgressSummary(level) {
   const raw = localStorage.getItem(progressKeyFor(level.id));
-  if (!raw) return "Not started";
+  if (!raw) return t("notStarted");
   try {
     const saved = JSON.parse(raw);
-    if (!Array.isArray(saved.answers) || saved.answers.length !== level.questions.length) return "Not started";
+    if (!Array.isArray(saved.answers) || saved.answers.length !== level.questions.length) return t("notStarted");
     const answered = saved.answers.filter((a) => a !== null).length;
     if (saved.completed) {
       const score = saved.answers.reduce((sum, a, i) => sum + (a === level.questions[i].answer ? 1 : 0), 0);
-      return `Completed — ${score}/${level.questions.length}`;
+      return t("completedScore", score, level.questions.length);
     }
     if (answered > 0) {
-      return `In progress — ${answered}/${level.questions.length}`;
+      return t("inProgress", answered, level.questions.length);
     }
-    return "Not started";
+    return t("notStarted");
   } catch {
-    return "Not started";
+    return t("notStarted");
   }
 }
 
@@ -176,29 +358,37 @@ function selectLevel(levelId) {
 }
 
 function resetProgress() {
-  if (!confirm("Start over? This will erase your saved progress for this level.")) return;
+  if (!confirm(t("confirmStartOver"))) return;
   localStorage.removeItem(progressKeyFor(currentLevel.id));
   state = freshState(TOTAL_QUESTIONS);
   renderQuestion();
 }
 
 function renderLevelPicker() {
+  currentView = { name: "levelPicker" };
+
   const cards = LEVELS.map((level) => {
     const progressLabel = levelProgressSummary(level);
+    const localized = LEVEL_TRANSLATIONS[level.id]?.[uiLang] || { name: level.name, description: level.description };
     return `
       <button class="level-card" data-level="${level.id}">
         <div class="level-badge">${level.label}</div>
-        <div class="level-name">${level.name}</div>
-        <div class="level-desc">${level.description}</div>
+        <div class="level-name">${localized.name}</div>
+        <div class="level-desc">${localized.description}</div>
         <div class="level-progress">${progressLabel}</div>
       </button>
     `;
   });
 
   app.innerHTML = `
-    <div class="level-picker">
-      <h1>Choose your level</h1>
-      <p class="level-picker-subtitle">Each level has 500 questions across 50 stages, with bilingual (English/Arabic) explanations.</p>
+    <div class="level-picker" ${rtlAttrs()}>
+      <div class="level-picker-top">
+        <div>
+          <h1>${t("chooseLevel")}</h1>
+          <p class="level-picker-subtitle">${t("chooseLevelSubtitle")}</p>
+        </div>
+        <button class="lang-toggle-btn ui-lang-toggle-btn" type="button">${t("switchUiLang")}</button>
+      </div>
       <div class="level-grid">${cards.join("")}</div>
     </div>
   `;
@@ -206,24 +396,27 @@ function renderLevelPicker() {
   document.querySelectorAll(".level-card").forEach((btn) => {
     btn.addEventListener("click", () => selectLevel(btn.dataset.level));
   });
+  document.querySelector(".ui-lang-toggle-btn").addEventListener("click", toggleUiLang);
 }
 
 function renderHeader(subtitle) {
   const answeredCount = state.answers.filter((a) => a !== null).length;
   const pct = Math.round((answeredCount / TOTAL_QUESTIONS) * 100);
   return `
-    <div class="header">
+    <div class="header" ${rtlAttrs()}>
       <div class="header-top">
-        <span class="brand">English Quiz <span class="level-tag">${currentLevel.label}</span></span>
+        <span class="brand">${t("appName")} <span class="level-tag">${currentLevel.label}</span></span>
         <div class="header-actions">
           <button class="icon-btn theme-toggle-btn" type="button">${isDarkActive() ? icon("sun") : icon("moon")}</button>
-          <button id="change-level-btn" class="link-btn desktop-only">Change Level</button>
-          <button id="start-over-btn" class="link-btn desktop-only">Start Over</button>
+          <button id="ui-lang-toggle-btn" class="link-btn desktop-only">${t("switchUiLang")}</button>
+          <button id="change-level-btn" class="link-btn desktop-only">${t("changeLevel")}</button>
+          <button id="start-over-btn" class="link-btn desktop-only">${t("startOver")}</button>
           <div class="header-menu mobile-only">
-            <button id="header-menu-btn" class="icon-btn" type="button" aria-label="Menu">${icon("moreVertical")}</button>
+            <button id="header-menu-btn" class="icon-btn" type="button" aria-label="${t("menu")}">${icon("moreVertical")}</button>
             <div class="header-menu-panel" id="header-menu-panel">
-              <button id="change-level-btn-mobile" class="header-menu-item" type="button">Change Level</button>
-              <button id="start-over-btn-mobile" class="header-menu-item" type="button">Start Over</button>
+              <button id="ui-lang-toggle-btn-mobile" class="header-menu-item" type="button">${t("switchUiLang")}</button>
+              <button id="change-level-btn-mobile" class="header-menu-item" type="button">${t("changeLevel")}</button>
+              <button id="start-over-btn-mobile" class="header-menu-item" type="button">${t("startOver")}</button>
             </div>
           </div>
         </div>
@@ -237,8 +430,10 @@ function renderHeader(subtitle) {
 function attachHeaderEvents() {
   document.getElementById("start-over-btn").addEventListener("click", resetProgress);
   document.getElementById("change-level-btn").addEventListener("click", renderLevelPicker);
+  document.getElementById("ui-lang-toggle-btn").addEventListener("click", toggleUiLang);
   document.getElementById("start-over-btn-mobile").addEventListener("click", resetProgress);
   document.getElementById("change-level-btn-mobile").addEventListener("click", renderLevelPicker);
+  document.getElementById("ui-lang-toggle-btn-mobile").addEventListener("click", toggleUiLang);
   document.getElementById("header-menu-btn").addEventListener("click", (e) => {
     e.stopPropagation();
     document.getElementById("header-menu-panel").classList.toggle("open");
@@ -265,13 +460,13 @@ function renderSidebar() {
     const start = s * STAGE_SIZE;
     const answeredInStage = state.answers.slice(start, start + STAGE_SIZE).filter((a) => a !== null).length;
 
-    let title = `Stage ${s + 1}`;
+    let title;
     if (status === "perfect" || status === "completed") {
-      title += ` — ${scoreForRange(start, start + STAGE_SIZE)}/${STAGE_SIZE}`;
+      title = t("stageTitleScore", s + 1, scoreForRange(start, start + STAGE_SIZE), STAGE_SIZE);
     } else if (status === "current") {
-      title += ` — in progress (${answeredInStage}/${STAGE_SIZE})`;
+      title = t("stageTitleInProgress", s + 1, answeredInStage, STAGE_SIZE);
     } else {
-      title += " — locked";
+      title = t("stageTitleLocked", s + 1);
     }
 
     boxes.push(
@@ -286,18 +481,18 @@ function renderSidebar() {
   ).length;
 
   return `
-    <aside class="sidebar" id="stage-sidebar">
+    <aside class="sidebar" id="stage-sidebar" ${rtlAttrs()}>
       <div class="sidebar-header-row">
-        <div class="sidebar-title">Stages</div>
-        <button class="icon-btn sidebar-close-btn" id="sidebar-close-btn" type="button" aria-label="Close">${icon("x")}</button>
+        <div class="sidebar-title">${t("stagesTitle")}</div>
+        <button class="icon-btn sidebar-close-btn" id="sidebar-close-btn" type="button" aria-label="${t("close")}">${icon("x")}</button>
       </div>
-      <div class="sidebar-summary">${doneCount} / ${TOTAL_STAGES} complete</div>
+      <div class="sidebar-summary">${t("stagesCompleteOf", doneCount, TOTAL_STAGES)}</div>
       <div class="stage-grid">${boxes.join("")}</div>
       <div class="legend">
-        <span><i class="dot current"></i> Current</span>
-        <span><i class="dot completed"></i> Done</span>
-        <span><i class="dot perfect"></i> Perfect</span>
-        <span><i class="dot locked"></i> Locked</span>
+        <span><i class="dot current"></i> ${t("legendCurrent")}</span>
+        <span><i class="dot completed"></i> ${t("legendDone")}</span>
+        <span><i class="dot perfect"></i> ${t("legendPerfect")}</span>
+        <span><i class="dot locked"></i> ${t("legendLocked")}</span>
       </div>
     </aside>
     <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
@@ -312,8 +507,8 @@ function renderStageBar() {
   ).length;
   const currentStageNum = stageOf(state.current) + 1;
   return `
-    <button class="stage-bar" id="stage-bar-btn" type="button">
-      <span class="stage-bar-text"><strong>Stage ${currentStageNum}</strong> of ${TOTAL_STAGES} &middot; ${doneCount} complete</span>
+    <button class="stage-bar" id="stage-bar-btn" type="button" ${rtlAttrs()}>
+      <span class="stage-bar-text">${t("stageBarLabel", currentStageNum, TOTAL_STAGES, doneCount)}</span>
       <span class="stage-bar-chevron">${icon("chevronRight")}</span>
     </button>
   `;
@@ -422,10 +617,10 @@ function animateGaugeFills() {
 }
 
 function resultsMessage(pct) {
-  if (pct >= 90) return "Outstanding work!";
-  if (pct >= 75) return "Great job!";
-  if (pct >= 50) return "Good effort — keep practicing!";
-  return "Keep going, you'll get there!";
+  if (pct >= 90) return t("resultOutstanding");
+  if (pct >= 75) return t("resultGreat");
+  if (pct >= 50) return t("resultGood");
+  return t("resultKeepGoing");
 }
 
 function celebrate() {
@@ -448,6 +643,7 @@ function celebrate() {
 }
 
 function renderQuestion() {
+  currentView = { name: "question" };
   const q = questions[state.current];
   const stageIndex = stageOf(state.current);
   const posInStage = (state.current % STAGE_SIZE) + 1;
@@ -459,14 +655,22 @@ function renderQuestion() {
       ${renderSidebar()}
       <div class="main-panel">
         ${renderHeader(
-          `Stage ${stageIndex + 1} of ${TOTAL_STAGES} &middot; Question ${posInStage} of ${STAGE_SIZE} &middot; Overall ${state.current + 1}/${TOTAL_QUESTIONS}`
+          t(
+            "subtitleQuestion",
+            stageIndex + 1,
+            TOTAL_STAGES,
+            posInStage,
+            STAGE_SIZE,
+            state.current + 1,
+            TOTAL_QUESTIONS
+          )
         )}
         ${renderStageBar()}
         <div class="quiz-card">
           <div class="question-row">
             <h2>${q.question}</h2>
             <div class="question-actions">
-              <button id="speak-question-btn" class="icon-btn" type="button" title="Listen to question" aria-label="Listen to question">${icon("speaker")}</button>
+              <button id="speak-question-btn" class="icon-btn" type="button" title="${t("listenToQuestion")}" aria-label="${t("listenToQuestion")}">${icon("speaker")}</button>
               <button id="translate-btn" class="translate-btn" type="button" title="عرض السؤال بالعربية">${icon("globe")} عربي</button>
             </div>
           </div>
@@ -482,7 +686,7 @@ function renderQuestion() {
                 return `
                   <div class="option-row">
                     <button class="${cls}" data-index="${i}" ${isAnswered ? "disabled" : ""}>${opt}</button>
-                    <button class="icon-btn speak-option-btn" data-option-index="${i}" type="button" title="Listen to option" aria-label="Listen to option">${icon("speaker")}</button>
+                    <button class="icon-btn speak-option-btn" data-option-index="${i}" type="button" title="${t("listenToOption")}" aria-label="${t("listenToOption")}">${icon("speaker")}</button>
                   </div>`;
               })
               .join("")}
@@ -490,14 +694,14 @@ function renderQuestion() {
           ${
             isAnswered
               ? `<div class="feedback ${picked === q.answer ? "feedback-correct" : "feedback-incorrect"}">
-                  <strong>${picked === q.answer ? "Correct!" : "Not quite."}</strong>
+                  <strong ${rtlAttrs()}>${picked === q.answer ? t("correct") : t("notQuite")}</strong>
                   <p>${q.explanation}</p>
                   <p class="feedback-ar" dir="rtl" lang="ar">${q.explanationAr}</p>
                 </div>`
               : ""
           }
-          <button id="next-btn" class="next-btn" ${isAnswered ? "" : "disabled"}>
-            ${state.current === TOTAL_QUESTIONS - 1 ? "Finish" : "Next"}
+          <button id="next-btn" class="next-btn" ${isAnswered ? "" : "disabled"} ${rtlAttrs()}>
+            ${state.current === TOTAL_QUESTIONS - 1 ? t("finish") : t("next")}
           </button>
         </div>
       </div>
@@ -559,6 +763,7 @@ function renderQuestion() {
 }
 
 function renderStageComplete(stageIndex) {
+  currentView = { name: "stageComplete", stageIndex };
   const start = stageIndex * STAGE_SIZE;
   const end = start + STAGE_SIZE;
   const score = scoreForRange(start, end);
@@ -567,13 +772,13 @@ function renderStageComplete(stageIndex) {
     <div class="layout">
       ${renderSidebar()}
       <div class="main-panel">
-        ${renderHeader(`Stage ${stageIndex + 1} of ${TOTAL_STAGES} complete`)}
+        ${renderHeader(t("subtitleStageComplete", stageIndex + 1, TOTAL_STAGES))}
         ${renderStageBar()}
-        <div class="quiz-card center">
-          <h2>Stage ${stageIndex + 1} Complete!</h2>
+        <div class="quiz-card center" ${rtlAttrs()}>
+          <h2>${t("stageComplete", stageIndex + 1)}</h2>
           ${renderScoreGauge(score, STAGE_SIZE, 100)}
           <button id="continue-btn" class="next-btn">
-            ${stageIndex + 1 < TOTAL_STAGES ? `Continue to Stage ${stageIndex + 2}` : "View Final Results"}
+            ${stageIndex + 1 < TOTAL_STAGES ? t("continueToStage", stageIndex + 2) : t("viewFinalResults")}
           </button>
         </div>
       </div>
@@ -589,6 +794,7 @@ function renderStageComplete(stageIndex) {
 }
 
 function renderStageReview(stageIndex) {
+  currentView = { name: "stageReview", stageIndex };
   const start = stageIndex * STAGE_SIZE;
   const end = start + STAGE_SIZE;
   const score = scoreForRange(start, end);
@@ -601,8 +807,8 @@ function renderStageReview(stageIndex) {
     items.push(`
       <div class="review-item ${isCorrect ? "correct" : "incorrect"}">
         <p class="review-question">${i - start + 1}. ${q.question}</p>
-        <p>Your answer: ${q.options[picked]}</p>
-        ${!isCorrect ? `<p>Correct answer: ${q.options[q.answer]}</p>` : ""}
+        <p>${t("yourAnswer")} ${q.options[picked]}</p>
+        ${!isCorrect ? `<p>${t("correctAnswer")} ${q.options[q.answer]}</p>` : ""}
       </div>
     `);
   }
@@ -611,12 +817,12 @@ function renderStageReview(stageIndex) {
     <div class="layout">
       ${renderSidebar()}
       <div class="main-panel">
-        ${renderHeader(`Reviewing Stage ${stageIndex + 1}`)}
+        ${renderHeader(t("subtitleReviewing", stageIndex + 1))}
         ${renderStageBar()}
         <div class="quiz-card">
-          <h2>Stage ${stageIndex + 1} Review — ${score} / ${STAGE_SIZE}</h2>
+          <h2 ${rtlAttrs()}>${t("stageReview", stageIndex + 1, score, STAGE_SIZE)}</h2>
           <div class="review-list">${items.join("")}</div>
-          <button id="back-btn" class="next-btn">Back</button>
+          <button id="back-btn" class="next-btn" ${rtlAttrs()}>${t("back")}</button>
         </div>
       </div>
     </div>
@@ -635,6 +841,7 @@ function renderStageReview(stageIndex) {
 }
 
 function renderResults(justCompleted) {
+  currentView = { name: "results" };
   const score = scoreForRange(0, TOTAL_QUESTIONS);
   const pct = Math.round((score / TOTAL_QUESTIONS) * 100);
 
@@ -644,7 +851,7 @@ function renderResults(justCompleted) {
     const stageScore = scoreForRange(start, start + STAGE_SIZE);
     stageRows.push(`
       <div class="stage-row">
-        <span>Stage ${s + 1}</span>
+        <span>${t("stageN", s + 1)}</span>
         <span>${stageScore} / ${STAGE_SIZE}</span>
       </div>
     `);
@@ -654,16 +861,16 @@ function renderResults(justCompleted) {
     <div class="layout">
       ${renderSidebar()}
       <div class="main-panel">
-        ${renderHeader("Quiz complete")}
+        ${renderHeader(t("subtitleQuizComplete"))}
         ${renderStageBar()}
-        <div class="quiz-card center">
-          <h2>Quiz Complete!</h2>
+        <div class="quiz-card center" ${rtlAttrs()}>
+          <h2>${t("quizComplete")}</h2>
           ${renderScoreGauge(score, TOTAL_QUESTIONS, 140)}
           <p class="results-message">${resultsMessage(pct)}</p>
           <div class="stage-breakdown">
             ${stageRows.join("")}
           </div>
-          <button id="restart-btn" class="next-btn">Take Quiz Again</button>
+          <button id="restart-btn" class="next-btn">${t("takeQuizAgain")}</button>
         </div>
       </div>
     </div>
