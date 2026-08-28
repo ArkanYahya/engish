@@ -380,10 +380,6 @@ body {
   background: var(--locked-dot);
 }
 
-.stage-bar {
-  display: none;
-}
-
 .sidebar-header-row {
   display: flex;
   align-items: center;
@@ -396,6 +392,13 @@ body {
 }
 
 .sidebar-backdrop {
+  display: none;
+}
+
+/* Only meaningful on mobile, where the header doubles as the button that opens the stage
+   bottom-sheet (see the media query below) — hidden by default since desktop's stage grid
+   is already always on-screen and clicking the header there is a harmless no-op. */
+.header-subtitle-chevron {
   display: none;
 }
 
@@ -446,23 +449,18 @@ body {
     grid-template-columns: repeat(6, 1fr);
   }
 
-  .stage-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 13px;
-    color: var(--text-strong-muted);
+  /* On mobile the stage grid lives in a bottom-sheet rather than always being visible
+     (see .sidebar rules above), so the header itself becomes the tap target that opens
+     it — the chevron hints at that; on desktop the grid is already on-screen, so neither
+     applies there. */
+  #header-stages-trigger {
     cursor: pointer;
   }
 
-  .stage-bar-chevron {
+  .header-subtitle-chevron {
     color: var(--text-tertiary);
     display: inline-flex;
+    flex-shrink: 0;
   }
 
   .next-btn {
@@ -561,8 +559,15 @@ body {
   transition: width 0.3s ease;
 }
 
-.header-subtitle {
+.header-subtitle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   margin-top: 8px;
+}
+
+.header-subtitle {
   font-size: 13px;
   color: var(--text-secondary);
 }
@@ -604,7 +609,7 @@ h2 {
 
 /* The chevron icon points "forward" (right in LTR); mirror it for RTL so it still
    points toward reading-forward direction instead of visually pointing backward. */
-[dir="rtl"] .stage-bar-chevron .icon {
+[dir="rtl"] .header-subtitle-chevron .icon {
   transform: scaleX(-1);
 }
 

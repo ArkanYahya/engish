@@ -135,7 +135,6 @@ const STRINGS = {
     stageTitleScore: (n, score, size) => `Stage ${n} — ${score}/${size}`,
     stageTitleInProgress: (n, x, size) => `Stage ${n} — in progress (${x}/${size})`,
     stageTitleLocked: (n) => `Stage ${n} — locked`,
-    stageBarLabel: (n, total, done) => `Stage ${n} of ${total} · ${done} complete`,
     subtitleQuestion: (stage, totalStages, q, stageSize, overall, total) =>
       `Stage ${stage} of ${totalStages} · Question ${q} of ${stageSize} · Overall ${overall}/${total}`,
     subtitleStageComplete: (stage, total) => `Stage ${stage} of ${total} complete`,
@@ -197,7 +196,6 @@ const STRINGS = {
     stageTitleScore: (n, score, size) => `المرحلة ${n} — ${score}/${size}`,
     stageTitleInProgress: (n, x, size) => `المرحلة ${n} — قيد التقدم (${x}/${size})`,
     stageTitleLocked: (n) => `المرحلة ${n} — مغلقة`,
-    stageBarLabel: (n, total, done) => `المرحلة ${n} من ${total} · ${done} مكتملة`,
     subtitleQuestion: (stage, totalStages, q, stageSize, overall, total) =>
       `المرحلة ${stage} من ${totalStages} · السؤال ${q} من ${stageSize} · الإجمالي ${overall}/${total}`,
     subtitleStageComplete: (stage, total) => `اكتملت المرحلة ${stage} من ${total}`,
@@ -529,18 +527,25 @@ function renderLevelPicker() {
   });
 }
 
+// The subtitle here already states the current stage ("Stage 3 of 50 · ..."), which made
+// the old separate mobile-only "Stage 3 of 50" bar (with its own tap-to-open-stages
+// affordance) pure duplication. The header itself is now the tap target for that instead —
+// id'd and given a chevron hint (mobile only, see CSS) so it visibly acts as one button.
 function renderHeader(subtitle) {
   const answeredCount = state.answers.filter((a) => a !== null).length;
   const pct = Math.round((answeredCount / TOTAL_QUESTIONS) * 100);
   const hasVocab = !!LEVEL_VOCABULARY[currentLevel.id];
   return `
-    <div class="header" ${rtlAttrs()}>
+    <div class="header" id="header-stages-trigger" ${rtlAttrs()}>
       <div class="header-top">
         <span class="level-tag">${currentLevel.label}</span>
         ${hasVocab ? `<button id="vocabulary-btn" class="link-btn" type="button">${t("vocabulary")}</button>` : ""}
       </div>
       <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
-      <div class="header-subtitle">${subtitle}</div>
+      <div class="header-subtitle-row">
+        <div class="header-subtitle">${subtitle}</div>
+        <span class="header-subtitle-chevron">${icon("chevronRight")}</span>
+      </div>
     </div>
   `;
 }
@@ -548,7 +553,10 @@ function renderHeader(subtitle) {
 function attachHeaderEvents() {
   // Wrapped in an arrow function — a bare `renderVocabulary` reference would receive the
   // click Event as its first argument, which collides with the preserveReturn parameter.
-  document.getElementById("vocabulary-btn")?.addEventListener("click", () => renderVocabulary());
+  document.getElementById("vocabulary-btn")?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    renderVocabulary();
+  });
 }
 
 function renderSidebar() {
@@ -597,21 +605,6 @@ function renderSidebar() {
   `;
 }
 
-// Mobile-only compact bar shown in place of the full stage grid; tapping it opens
-// the grid as a bottom-sheet (the same .sidebar element, repositioned via CSS).
-function renderStageBar() {
-  const doneCount = Array.from({ length: TOTAL_STAGES }, (_, s) => stageStatus(s)).filter(
-    (st) => st === "perfect" || st === "completed"
-  ).length;
-  const currentStageNum = stageOf(state.current) + 1;
-  return `
-    <button class="stage-bar" id="stage-bar-btn" type="button" ${rtlAttrs()}>
-      <span class="stage-bar-text">${t("stageBarLabel", currentStageNum, TOTAL_STAGES, doneCount)}</span>
-      <span class="stage-bar-chevron">${icon("chevronRight")}</span>
-    </button>
-  `;
-}
-
 function attachSidebarEvents() {
   document.querySelectorAll(".stage-box").forEach((btn) => {
     if (btn.disabled) return;
@@ -628,14 +621,16 @@ function attachSidebarEvents() {
 
   const sidebarEl = document.getElementById("stage-sidebar");
   const backdrop = document.getElementById("sidebar-backdrop");
-  const stageBarBtn = document.getElementById("stage-bar-btn");
+  const headerTrigger = document.getElementById("header-stages-trigger");
   const closeBtn = document.getElementById("sidebar-close-btn");
   if (!sidebarEl || !backdrop) return;
 
   const openSheet = () => sidebarEl.classList.add("open");
   const closeSheet = () => sidebarEl.classList.remove("open");
 
-  stageBarBtn?.addEventListener("click", openSheet);
+  // On desktop the stage grid is already always visible in the sidebar, so this is a
+  // harmless no-op there — the mobile bottom-sheet behavior (see CSS) is what it's for.
+  headerTrigger?.addEventListener("click", openSheet);
   backdrop.addEventListener("click", closeSheet);
   closeBtn?.addEventListener("click", closeSheet);
 }
@@ -765,7 +760,6 @@ function renderQuestion() {
             TOTAL_QUESTIONS
           )
         )}
-        ${renderStageBar()}
         <div class="quiz-card">
           <div class="question-row">
             <h2>${q.question}</h2>
@@ -877,7 +871,6 @@ function renderStageComplete(stageIndex) {
       ${renderSidebar()}
       <div class="main-panel">
         ${renderHeader(t("subtitleStageComplete", stageIndex + 1, TOTAL_STAGES))}
-        ${renderStageBar()}
         <div class="quiz-card center" ${rtlAttrs()}>
           <h2>${t("stageComplete", stageIndex + 1)}</h2>
           ${renderScoreGauge(score, STAGE_SIZE, 100)}
@@ -926,7 +919,6 @@ function renderStageReview(stageIndex) {
       ${renderSidebar()}
       <div class="main-panel">
         ${renderHeader(t("subtitleReviewing", stageIndex + 1))}
-        ${renderStageBar()}
         <div class="quiz-card">
           <h2 ${rtlAttrs()}>${t("stageReview", stageIndex + 1, score, STAGE_SIZE)}</h2>
           <div class="review-list">${items.join("")}</div>
@@ -974,7 +966,6 @@ function renderResults(justCompleted) {
       ${renderSidebar()}
       <div class="main-panel">
         ${renderHeader(t("subtitleQuizComplete"))}
-        ${renderStageBar()}
         <div class="quiz-card center" ${rtlAttrs()}>
           <h2>${t("quizComplete")}</h2>
           ${renderScoreGauge(score, TOTAL_QUESTIONS, 140)}
