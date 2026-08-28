@@ -6,6 +6,73 @@ if ("serviceWorker" in navigator) {
   });
 }
 
+// Small inline-SVG icon set (feather-style) so icons look identical across every OS/browser,
+// instead of relying on emoji glyphs that render differently per platform.
+const ICONS = {
+  speaker:
+    '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>',
+  globe:
+    '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z"/></svg>',
+  moreVertical:
+    '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>',
+  x: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+  chevronRight:
+    '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>',
+  sun: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.07" y2="4.93"/></svg>',
+  moon: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>',
+};
+
+function icon(name) {
+  return ICONS[name] || "";
+}
+
+// Theme: "light" | "dark" | null (null = follow system preference).
+const THEME_KEY = "engish-quiz-theme";
+
+function getStoredTheme() {
+  try {
+    return localStorage.getItem(THEME_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function isDarkActive() {
+  const stored = getStoredTheme();
+  if (stored === "dark") return true;
+  if (stored === "light") return false;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
+
+function applyTheme() {
+  const stored = getStoredTheme();
+  if (stored === "dark" || stored === "light") {
+    document.documentElement.setAttribute("data-theme", stored);
+  } else {
+    document.documentElement.removeAttribute("data-theme");
+  }
+}
+
+function toggleTheme() {
+  const next = isDarkActive() ? "light" : "dark";
+  try {
+    localStorage.setItem(THEME_KEY, next);
+  } catch {
+    // ignore — theme just won't persist across reloads
+  }
+  applyTheme();
+  updateThemeToggleIcon();
+}
+
+function updateThemeToggleIcon() {
+  document.querySelectorAll(".theme-toggle-btn").forEach((btn) => {
+    btn.innerHTML = isDarkActive() ? icon("sun") : icon("moon");
+    btn.setAttribute("aria-label", isDarkActive() ? "Switch to light mode" : "Switch to dark mode");
+  });
+}
+
+applyTheme();
+
 const SELECTED_LEVEL_KEY = "engish-quiz-selected-level";
 const progressKeyFor = (levelId) => `engish-quiz-progress-${levelId}`;
 
@@ -149,10 +216,11 @@ function renderHeader(subtitle) {
       <div class="header-top">
         <span class="brand">English Quiz <span class="level-tag">${currentLevel.label}</span></span>
         <div class="header-actions">
+          <button class="icon-btn theme-toggle-btn" type="button">${isDarkActive() ? icon("sun") : icon("moon")}</button>
           <button id="change-level-btn" class="link-btn desktop-only">Change Level</button>
           <button id="start-over-btn" class="link-btn desktop-only">Start Over</button>
           <div class="header-menu mobile-only">
-            <button id="header-menu-btn" class="icon-btn" type="button" aria-label="Menu">⋯</button>
+            <button id="header-menu-btn" class="icon-btn" type="button" aria-label="Menu">${icon("moreVertical")}</button>
             <div class="header-menu-panel" id="header-menu-panel">
               <button id="change-level-btn-mobile" class="header-menu-item" type="button">Change Level</button>
               <button id="start-over-btn-mobile" class="header-menu-item" type="button">Start Over</button>
@@ -175,6 +243,8 @@ function attachHeaderEvents() {
     e.stopPropagation();
     document.getElementById("header-menu-panel").classList.toggle("open");
   });
+  document.querySelectorAll(".theme-toggle-btn").forEach((btn) => btn.addEventListener("click", toggleTheme));
+  updateThemeToggleIcon();
 }
 
 // Attached once for the app's lifetime (not per render) so it never accumulates
@@ -219,7 +289,7 @@ function renderSidebar() {
     <aside class="sidebar" id="stage-sidebar">
       <div class="sidebar-header-row">
         <div class="sidebar-title">Stages</div>
-        <button class="icon-btn sidebar-close-btn" id="sidebar-close-btn" type="button" aria-label="Close">✕</button>
+        <button class="icon-btn sidebar-close-btn" id="sidebar-close-btn" type="button" aria-label="Close">${icon("x")}</button>
       </div>
       <div class="sidebar-summary">${doneCount} / ${TOTAL_STAGES} complete</div>
       <div class="stage-grid">${boxes.join("")}</div>
@@ -244,7 +314,7 @@ function renderStageBar() {
   return `
     <button class="stage-bar" id="stage-bar-btn" type="button">
       <span class="stage-bar-text"><strong>Stage ${currentStageNum}</strong> of ${TOTAL_STAGES} &middot; ${doneCount} complete</span>
-      <span class="stage-bar-chevron">›</span>
+      <span class="stage-bar-chevron">${icon("chevronRight")}</span>
     </button>
   `;
 }
@@ -294,7 +364,7 @@ function openTranslationModal(questionEn, questionAr) {
   overlay.className = "modal-overlay";
   overlay.innerHTML = `
     <div class="modal-box">
-      <button class="modal-close" aria-label="Close">&times;</button>
+      <button class="modal-close" aria-label="Close">${icon("x")}</button>
       <p class="modal-label">English</p>
       <p class="modal-question-en">${questionEn}</p>
       <p class="modal-label" dir="rtl">بالعربية</p>
@@ -316,6 +386,67 @@ function openTranslationModal(questionEn, questionAr) {
   });
 }
 
+function renderScoreGauge(score, total, size) {
+  const pct = total > 0 ? Math.round((score / total) * 100) : 0;
+  const radius = (size - 16) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const center = size / 2;
+  const targetOffset = circumference * (1 - pct / 100);
+  return `
+    <div class="score-gauge" style="width:${size}px;height:${size}px;">
+      <svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
+        <circle class="gauge-track" cx="${center}" cy="${center}" r="${radius}" />
+        <circle class="gauge-fill" cx="${center}" cy="${center}" r="${radius}"
+          stroke-dasharray="${circumference}" stroke-dashoffset="${circumference}"
+          data-target-offset="${targetOffset}" transform="rotate(-90 ${center} ${center})" />
+      </svg>
+      <div class="gauge-label">
+        <div class="gauge-percent">${pct}%</div>
+        <div class="gauge-score">${score}/${total}</div>
+      </div>
+    </div>
+  `;
+}
+
+// Gauges render at 0% first, then animate to their target on the next frame — this only
+// works as a CSS transition if the change happens *after* the initial paint.
+function animateGaugeFills() {
+  document.querySelectorAll(".gauge-fill").forEach((el) => {
+    const target = el.dataset.targetOffset;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        el.style.strokeDashoffset = target;
+      });
+    });
+  });
+}
+
+function resultsMessage(pct) {
+  if (pct >= 90) return "Outstanding work!";
+  if (pct >= 75) return "Great job!";
+  if (pct >= 50) return "Good effort — keep practicing!";
+  return "Keep going, you'll get there!";
+}
+
+function celebrate() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const colors = ["#6366f1", "#22c55e", "#f59e0b", "#ef4444", "#3b82f6", "#ec4899"];
+  const container = document.createElement("div");
+  container.className = "confetti-container";
+  for (let i = 0; i < 60; i++) {
+    const piece = document.createElement("span");
+    piece.className = "confetti-piece";
+    piece.style.left = `${Math.random() * 100}%`;
+    piece.style.background = colors[i % colors.length];
+    piece.style.animationDelay = `${Math.random() * 0.4}s`;
+    piece.style.animationDuration = `${1.6 + Math.random() * 1.2}s`;
+    piece.style.setProperty("--drift", `${(Math.random() - 0.5) * 160}px`);
+    container.appendChild(piece);
+  }
+  document.body.appendChild(container);
+  setTimeout(() => container.remove(), 3200);
+}
+
 function renderQuestion() {
   const q = questions[state.current];
   const stageIndex = stageOf(state.current);
@@ -335,8 +466,8 @@ function renderQuestion() {
           <div class="question-row">
             <h2>${q.question}</h2>
             <div class="question-actions">
-              <button id="speak-question-btn" class="icon-btn" type="button" title="Listen to question" aria-label="Listen to question">🔊</button>
-              <button id="translate-btn" class="translate-btn" type="button" title="عرض السؤال بالعربية">🌐 عربي</button>
+              <button id="speak-question-btn" class="icon-btn" type="button" title="Listen to question" aria-label="Listen to question">${icon("speaker")}</button>
+              <button id="translate-btn" class="translate-btn" type="button" title="عرض السؤال بالعربية">${icon("globe")} عربي</button>
             </div>
           </div>
           <div class="options">
@@ -351,7 +482,7 @@ function renderQuestion() {
                 return `
                   <div class="option-row">
                     <button class="${cls}" data-index="${i}" ${isAnswered ? "disabled" : ""}>${opt}</button>
-                    <button class="icon-btn speak-option-btn" data-option-index="${i}" type="button" title="Listen to option" aria-label="Listen to option">🔊</button>
+                    <button class="icon-btn speak-option-btn" data-option-index="${i}" type="button" title="Listen to option" aria-label="Listen to option">${icon("speaker")}</button>
                   </div>`;
               })
               .join("")}
@@ -411,7 +542,7 @@ function renderQuestion() {
     if (isLastQuestion) {
       state.completed = true;
       saveState();
-      renderResults();
+      renderResults(true);
       return;
     }
 
@@ -440,7 +571,7 @@ function renderStageComplete(stageIndex) {
         ${renderStageBar()}
         <div class="quiz-card center">
           <h2>Stage ${stageIndex + 1} Complete!</h2>
-          <p class="stage-score">Score: ${score} / ${STAGE_SIZE}</p>
+          ${renderScoreGauge(score, STAGE_SIZE, 100)}
           <button id="continue-btn" class="next-btn">
             ${stageIndex + 1 < TOTAL_STAGES ? `Continue to Stage ${stageIndex + 2}` : "View Final Results"}
           </button>
@@ -451,6 +582,8 @@ function renderStageComplete(stageIndex) {
 
   attachHeaderEvents();
   attachSidebarEvents();
+  animateGaugeFills();
+  if (score === STAGE_SIZE) celebrate();
 
   document.getElementById("continue-btn").addEventListener("click", renderQuestion);
 }
@@ -501,8 +634,9 @@ function renderStageReview(stageIndex) {
   });
 }
 
-function renderResults() {
+function renderResults(justCompleted) {
   const score = scoreForRange(0, TOTAL_QUESTIONS);
+  const pct = Math.round((score / TOTAL_QUESTIONS) * 100);
 
   const stageRows = [];
   for (let s = 0; s < TOTAL_STAGES; s++) {
@@ -522,8 +656,10 @@ function renderResults() {
       <div class="main-panel">
         ${renderHeader("Quiz complete")}
         ${renderStageBar()}
-        <div class="quiz-card">
-          <h2>Final Score: ${score} / ${TOTAL_QUESTIONS}</h2>
+        <div class="quiz-card center">
+          <h2>Quiz Complete!</h2>
+          ${renderScoreGauge(score, TOTAL_QUESTIONS, 140)}
+          <p class="results-message">${resultsMessage(pct)}</p>
           <div class="stage-breakdown">
             ${stageRows.join("")}
           </div>
@@ -535,6 +671,8 @@ function renderResults() {
 
   attachHeaderEvents();
   attachSidebarEvents();
+  animateGaugeFills();
+  if (justCompleted) celebrate();
 
   document.getElementById("restart-btn").addEventListener("click", resetProgress);
 }
