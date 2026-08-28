@@ -1,5 +1,9 @@
 import { LEVELS, getLevel } from "./levels/index.js";
-import { VOCABULARY } from "./levels/a1-vocabulary.js";
+import { VOCABULARY as A1_VOCABULARY } from "./levels/a1-vocabulary.js";
+
+// Vocabulary is level-specific (each level will eventually get its own list) — a level
+// with no entry here simply has no "Vocabulary" link/screen at all.
+const LEVEL_VOCABULARY = { a1: A1_VOCABULARY };
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
@@ -21,6 +25,8 @@ const ICONS = {
     '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>',
   sun: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.07" y2="4.93"/></svg>',
   moon: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>',
+  settings:
+    '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
 };
 
 function icon(name) {
@@ -101,16 +107,18 @@ const LEVEL_TRANSLATIONS = {
 const STRINGS = {
   en: {
     appName: "English Quiz",
-    changeLevel: "Change Level",
-    startOver: "Start Over",
+    settings: "Settings",
+    language: "Language",
+    cancel: "Cancel",
+    confirmYes: "Yes, Start Over",
     menu: "Menu",
     close: "Close",
     switchToLight: "Switch to light mode",
     switchToDark: "Switch to dark mode",
     switchUiLang: "عربي",
     vocabulary: "Vocabulary",
-    vocabularyTitle: "A1 Vocabulary",
-    vocabularySubtitle: "Browse core words from the A1 level, with Arabic meanings and pronunciation.",
+    vocabularyTitle: (label) => `${label} Vocabulary`,
+    vocabularySubtitle: (label) => `Browse core words from the ${label} level, with Arabic meanings and pronunciation.`,
     quizMe: "Quiz Me",
     vocabQuizNext: "Next Word",
     vocabQuizScore: (score, total) => `Score: ${score}/${total}`,
@@ -161,16 +169,18 @@ const STRINGS = {
   },
   ar: {
     appName: "اختبار الإنجليزية",
-    changeLevel: "تغيير المستوى",
-    startOver: "البدء من جديد",
+    settings: "الإعدادات",
+    language: "اللغة",
+    cancel: "إلغاء",
+    confirmYes: "نعم، ابدأ من جديد",
     menu: "القائمة",
     close: "إغلاق",
     switchToLight: "التبديل إلى الوضع الفاتح",
     switchToDark: "التبديل إلى الوضع الداكن",
     switchUiLang: "English",
     vocabulary: "المفردات",
-    vocabularyTitle: "مفردات المستوى A1",
-    vocabularySubtitle: "تصفح الكلمات الأساسية لمستوى A1، مع معانيها بالعربية ونطقها.",
+    vocabularyTitle: (label) => `مفردات المستوى ${label}`,
+    vocabularySubtitle: (label) => `تصفح الكلمات الأساسية لمستوى ${label}، مع معانيها بالعربية ونطقها.`,
     quizMe: "اختبرني",
     vocabQuizNext: "الكلمة التالية",
     vocabQuizScore: (score, total) => `النتيجة: ${score}/${total}`,
@@ -282,7 +292,9 @@ function rerenderCurrentScreen() {
       renderResults();
       break;
     case "vocabulary":
-      renderVocabulary();
+      // Re-rendering the same screen in place (e.g. a language toggle while already
+      // viewing it) — must not overwrite the "return to" target with itself.
+      renderVocabulary(true);
       break;
     default:
       renderLevelPicker();
@@ -380,10 +392,108 @@ function selectLevel(levelId) {
 }
 
 function resetProgress() {
-  if (!confirm(t("confirmStartOver"))) return;
-  localStorage.removeItem(progressKeyFor(currentLevel.id));
-  state = freshState(TOTAL_QUESTIONS);
-  renderQuestion();
+  openConfirmModal(t("confirmStartOver"), () => {
+    localStorage.removeItem(progressKeyFor(currentLevel.id));
+    state = freshState(TOTAL_QUESTIONS);
+    renderQuestion();
+  });
+}
+
+// Generic styled Yes/Cancel confirmation, replacing the browser's native confirm() so
+// destructive actions look and behave like the rest of the app (themed, RTL-aware).
+function openConfirmModal(message, onConfirm) {
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `
+    <div class="modal-box confirm-box" ${rtlAttrs()}>
+      <p class="confirm-message">${message}</p>
+      <div class="confirm-actions">
+        <button class="confirm-cancel-btn" type="button">${t("cancel")}</button>
+        <button class="confirm-ok-btn" type="button">${t("confirmYes")}</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const close = () => {
+    document.removeEventListener("keydown", onKey);
+    overlay.remove();
+  };
+  function onKey(e) {
+    if (e.key === "Escape") close();
+  }
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) close();
+  });
+  document.addEventListener("keydown", onKey);
+
+  overlay.querySelector(".confirm-cancel-btn").addEventListener("click", close);
+  overlay.querySelector(".confirm-ok-btn").addEventListener("click", () => {
+    close();
+    onConfirm();
+  });
+}
+
+// Persistent app chrome (brand/home, theme toggle, settings) rendered identically at the
+// top of every screen — Level Picker, Vocabulary, and every quiz screen alike — instead of
+// being duplicated (and inconsistently available) per screen.
+function renderTopBar() {
+  return `
+    <div class="top-bar" ${rtlAttrs()}>
+      <button class="brand-home-btn" type="button">${t("appName")}</button>
+      <div class="top-bar-actions">
+        <button class="icon-btn theme-toggle-btn" type="button">${isDarkActive() ? icon("sun") : icon("moon")}</button>
+        <button class="icon-btn settings-btn" type="button" aria-label="${t("settings")}" title="${t("settings")}">${icon("settings")}</button>
+      </div>
+    </div>
+  `;
+}
+
+function attachTopBarEvents() {
+  document.querySelectorAll(".brand-home-btn").forEach((btn) => btn.addEventListener("click", renderLevelPicker));
+  document.querySelectorAll(".theme-toggle-btn").forEach((btn) => btn.addEventListener("click", toggleTheme));
+  document.querySelectorAll(".settings-btn").forEach((btn) => btn.addEventListener("click", openSettingsModal));
+  updateThemeToggleIcon();
+}
+
+// App-wide preferences live here instead of being repeated in every screen's header —
+// currently just the UI language, with room to grow.
+function openSettingsModal() {
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  document.body.appendChild(overlay);
+
+  const close = () => {
+    document.removeEventListener("keydown", onKey);
+    overlay.remove();
+  };
+  function onKey(e) {
+    if (e.key === "Escape") close();
+  }
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) close();
+  });
+  document.addEventListener("keydown", onKey);
+
+  function render() {
+    overlay.innerHTML = `
+      <div class="modal-box settings-box" ${rtlAttrs()}>
+        <button class="modal-close" aria-label="${t("close")}">${icon("x")}</button>
+        <p class="modal-label">${t("settings")}</p>
+        <div class="settings-row">
+          <span class="settings-row-label">${t("language")}</span>
+          <button class="lang-toggle-btn" type="button">${t("switchUiLang")}</button>
+        </div>
+      </div>
+    `;
+    overlay.querySelector(".modal-close").addEventListener("click", close);
+    overlay.querySelector(".lang-toggle-btn").addEventListener("click", () => {
+      toggleUiLang();
+      render();
+    });
+  }
+
+  render();
 }
 
 function renderLevelPicker() {
@@ -403,47 +513,31 @@ function renderLevelPicker() {
   });
 
   app.innerHTML = `
-    <div class="level-picker" ${rtlAttrs()}>
-      <div class="level-picker-top">
-        <div>
-          <h1>${t("chooseLevel")}</h1>
-          <p class="level-picker-subtitle">${t("chooseLevelSubtitle")}</p>
-        </div>
-        <button class="lang-toggle-btn ui-lang-toggle-btn" type="button">${t("switchUiLang")}</button>
+    <div class="page">
+      ${renderTopBar()}
+      <div class="level-picker" ${rtlAttrs()}>
+        <h1>${t("chooseLevel")}</h1>
+        <p class="level-picker-subtitle">${t("chooseLevelSubtitle")}</p>
+        <div class="level-grid">${cards.join("")}</div>
       </div>
-      <div class="level-grid">${cards.join("")}</div>
     </div>
   `;
 
+  attachTopBarEvents();
   document.querySelectorAll(".level-card").forEach((btn) => {
     btn.addEventListener("click", () => selectLevel(btn.dataset.level));
   });
-  document.querySelector(".ui-lang-toggle-btn").addEventListener("click", toggleUiLang);
 }
 
 function renderHeader(subtitle) {
   const answeredCount = state.answers.filter((a) => a !== null).length;
   const pct = Math.round((answeredCount / TOTAL_QUESTIONS) * 100);
+  const hasVocab = !!LEVEL_VOCABULARY[currentLevel.id];
   return `
     <div class="header" ${rtlAttrs()}>
       <div class="header-top">
-        <span class="brand">${t("appName")} <span class="level-tag">${currentLevel.label}</span></span>
-        <div class="header-actions">
-          <button class="icon-btn theme-toggle-btn" type="button">${isDarkActive() ? icon("sun") : icon("moon")}</button>
-          <button id="ui-lang-toggle-btn" class="link-btn desktop-only">${t("switchUiLang")}</button>
-          <button id="vocabulary-btn" class="link-btn desktop-only">${t("vocabulary")}</button>
-          <button id="change-level-btn" class="link-btn desktop-only">${t("changeLevel")}</button>
-          <button id="start-over-btn" class="link-btn desktop-only">${t("startOver")}</button>
-          <div class="header-menu mobile-only">
-            <button id="header-menu-btn" class="icon-btn" type="button" aria-label="${t("menu")}">${icon("moreVertical")}</button>
-            <div class="header-menu-panel" id="header-menu-panel">
-              <button id="ui-lang-toggle-btn-mobile" class="header-menu-item" type="button">${t("switchUiLang")}</button>
-              <button id="vocabulary-btn-mobile" class="header-menu-item" type="button">${t("vocabulary")}</button>
-              <button id="change-level-btn-mobile" class="header-menu-item" type="button">${t("changeLevel")}</button>
-              <button id="start-over-btn-mobile" class="header-menu-item" type="button">${t("startOver")}</button>
-            </div>
-          </div>
-        </div>
+        <span class="level-tag">${currentLevel.label}</span>
+        ${hasVocab ? `<button id="vocabulary-btn" class="link-btn" type="button">${t("vocabulary")}</button>` : ""}
       </div>
       <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
       <div class="header-subtitle">${subtitle}</div>
@@ -452,32 +546,10 @@ function renderHeader(subtitle) {
 }
 
 function attachHeaderEvents() {
-  document.getElementById("start-over-btn").addEventListener("click", resetProgress);
-  document.getElementById("change-level-btn").addEventListener("click", renderLevelPicker);
-  document.getElementById("ui-lang-toggle-btn").addEventListener("click", toggleUiLang);
-  document.getElementById("vocabulary-btn").addEventListener("click", renderVocabulary);
-  document.getElementById("start-over-btn-mobile").addEventListener("click", resetProgress);
-  document.getElementById("change-level-btn-mobile").addEventListener("click", renderLevelPicker);
-  document.getElementById("ui-lang-toggle-btn-mobile").addEventListener("click", toggleUiLang);
-  document.getElementById("vocabulary-btn-mobile").addEventListener("click", renderVocabulary);
-  document.getElementById("header-menu-btn").addEventListener("click", (e) => {
-    e.stopPropagation();
-    document.getElementById("header-menu-panel").classList.toggle("open");
-  });
-  document.querySelectorAll(".theme-toggle-btn").forEach((btn) => btn.addEventListener("click", toggleTheme));
-  updateThemeToggleIcon();
+  // Wrapped in an arrow function — a bare `renderVocabulary` reference would receive the
+  // click Event as its first argument, which collides with the preserveReturn parameter.
+  document.getElementById("vocabulary-btn")?.addEventListener("click", () => renderVocabulary());
 }
-
-// Attached once for the app's lifetime (not per render) so it never accumulates
-// duplicate listeners on `document` across re-renders.
-document.addEventListener("click", (e) => {
-  const menuBtn = document.getElementById("header-menu-btn");
-  const menuPanel = document.getElementById("header-menu-panel");
-  if (!menuBtn || !menuPanel) return;
-  if (!menuPanel.contains(e.target) && e.target !== menuBtn) {
-    menuPanel.classList.remove("open");
-  }
-});
 
 function renderSidebar() {
   const boxes = [];
@@ -677,7 +749,9 @@ function renderQuestion() {
   const isAnswered = picked !== null;
 
   app.innerHTML = `
-    <div class="layout">
+    <div class="page">
+      ${renderTopBar()}
+      <div class="layout">
       ${renderSidebar()}
       <div class="main-panel">
         ${renderHeader(
@@ -697,7 +771,7 @@ function renderQuestion() {
             <h2>${q.question}</h2>
             <div class="question-actions">
               <button id="speak-question-btn" class="icon-btn" type="button" title="${t("listenToQuestion")}" aria-label="${t("listenToQuestion")}">${icon("speaker")}</button>
-              <button id="translate-btn" class="translate-btn" type="button" title="عرض السؤال بالعربية">${icon("globe")} عربي</button>
+              <button id="translate-btn" class="icon-btn" type="button" title="عرض السؤال بالعربية" aria-label="عرض السؤال بالعربية">${icon("globe")}</button>
             </div>
           </div>
           <div class="options">
@@ -731,9 +805,11 @@ function renderQuestion() {
           </button>
         </div>
       </div>
+      </div>
     </div>
   `;
 
+  attachTopBarEvents();
   attachHeaderEvents();
   attachSidebarEvents();
 
@@ -795,7 +871,9 @@ function renderStageComplete(stageIndex) {
   const score = scoreForRange(start, end);
 
   app.innerHTML = `
-    <div class="layout">
+    <div class="page">
+      ${renderTopBar()}
+      <div class="layout">
       ${renderSidebar()}
       <div class="main-panel">
         ${renderHeader(t("subtitleStageComplete", stageIndex + 1, TOTAL_STAGES))}
@@ -808,9 +886,11 @@ function renderStageComplete(stageIndex) {
           </button>
         </div>
       </div>
+      </div>
     </div>
   `;
 
+  attachTopBarEvents();
   attachHeaderEvents();
   attachSidebarEvents();
   animateGaugeFills();
@@ -840,7 +920,9 @@ function renderStageReview(stageIndex) {
   }
 
   app.innerHTML = `
-    <div class="layout">
+    <div class="page">
+      ${renderTopBar()}
+      <div class="layout">
       ${renderSidebar()}
       <div class="main-panel">
         ${renderHeader(t("subtitleReviewing", stageIndex + 1))}
@@ -851,9 +933,11 @@ function renderStageReview(stageIndex) {
           <button id="back-btn" class="next-btn" ${rtlAttrs()}>${t("back")}</button>
         </div>
       </div>
+      </div>
     </div>
   `;
 
+  attachTopBarEvents();
   attachHeaderEvents();
   attachSidebarEvents();
 
@@ -884,7 +968,9 @@ function renderResults(justCompleted) {
   }
 
   app.innerHTML = `
-    <div class="layout">
+    <div class="page">
+      ${renderTopBar()}
+      <div class="layout">
       ${renderSidebar()}
       <div class="main-panel">
         ${renderHeader(t("subtitleQuizComplete"))}
@@ -899,9 +985,11 @@ function renderResults(justCompleted) {
           <button id="restart-btn" class="next-btn">${t("takeQuizAgain")}</button>
         </div>
       </div>
+      </div>
     </div>
   `;
 
+  attachTopBarEvents();
   attachHeaderEvents();
   attachSidebarEvents();
   animateGaugeFills();
@@ -949,11 +1037,15 @@ function bumpVocabMistake(category, en, delta) {
 // `preserveReturn` is used when refreshing the list in place (e.g. after the quiz modal
 // closes, to pick up updated mistake badges) — a normal navigation into this screen should
 // remember where it came from, but a same-screen refresh must not overwrite that memory.
+function currentLevelVocabulary() {
+  return LEVEL_VOCABULARY[currentLevel?.id] || [];
+}
+
 function renderVocabulary(preserveReturn = false) {
   if (!preserveReturn) vocabularyReturnView = currentView;
   currentView = { name: "vocabulary" };
 
-  const sections = VOCABULARY.map((group) => {
+  const sections = currentLevelVocabulary().map((group) => {
     const catName = isArabicUi() ? group.categoryAr : group.category;
     const rows = group.words
       .map((w, i) => {
@@ -984,17 +1076,21 @@ function renderVocabulary(preserveReturn = false) {
   }).join("");
 
   app.innerHTML = `
-    <div class="vocab-page" ${rtlAttrs()}>
-      <div class="vocab-header">
-        <button class="icon-btn vocab-back-btn" type="button" aria-label="${t("back")}">${icon("chevronRight")}</button>
-        <h1>${t("vocabularyTitle")}</h1>
+    <div class="page">
+      ${renderTopBar()}
+      <div class="vocab-page" ${rtlAttrs()}>
+        <div class="vocab-header">
+          <button class="icon-btn vocab-back-btn" type="button" aria-label="${t("back")}">${icon("chevronRight")}</button>
+          <h1>${t("vocabularyTitle", currentLevel.label)}</h1>
+        </div>
+        <p class="vocab-subtitle">${t("vocabularySubtitle", currentLevel.label)}</p>
+        <button class="next-btn vocab-quiz-trigger-btn" type="button">${t("quizMe")}</button>
+        ${sections}
       </div>
-      <p class="vocab-subtitle">${t("vocabularySubtitle")}</p>
-      <button class="next-btn vocab-quiz-trigger-btn" type="button">${t("quizMe")}</button>
-      ${sections}
     </div>
   `;
 
+  attachTopBarEvents();
   document.querySelector(".vocab-back-btn").addEventListener("click", () => {
     currentView = vocabularyReturnView;
     rerenderCurrentScreen();
@@ -1027,7 +1123,7 @@ function renderVocabulary(preserveReturn = false) {
 }
 
 function findVocabWord(category, en) {
-  const group = VOCABULARY.find((g) => g.category === category);
+  const group = currentLevelVocabulary().find((g) => g.category === category);
   return group?.words.find((w) => w.en === en);
 }
 
@@ -1085,9 +1181,13 @@ function openVocabExampleModal(word) {
   render();
 }
 
-const ALL_VOCAB_WORDS = VOCABULARY.flatMap((group) =>
-  group.words.map((w) => ({ ...w, category: group.category }))
-);
+// Recomputed on demand (not cached at module load) since it needs to reflect whichever
+// level is currently active.
+function getAllVocabWords() {
+  return currentLevelVocabulary().flatMap((group) =>
+    group.words.map((w) => ({ ...w, category: group.category }))
+  );
+}
 
 function shuffleRandomly(arr) {
   const copy = [...arr];
@@ -1102,8 +1202,9 @@ function shuffleRandomly(arr) {
 // question indices), this mini quiz has no persisted state at all — genuine Math.random()
 // is fine and is what the user asked for.
 function pickVocabQuizQuestion() {
-  const correctWord = ALL_VOCAB_WORDS[Math.floor(Math.random() * ALL_VOCAB_WORDS.length)];
-  const distractorPool = ALL_VOCAB_WORDS.filter((w) => w.ar !== correctWord.ar);
+  const allWords = getAllVocabWords();
+  const correctWord = allWords[Math.floor(Math.random() * allWords.length)];
+  const distractorPool = allWords.filter((w) => w.ar !== correctWord.ar);
   const distractors = shuffleRandomly(distractorPool).slice(0, 3);
   const options = shuffleRandomly([correctWord, ...distractors]);
   return { word: correctWord.en, category: correctWord.category, correctAr: correctWord.ar, options, pickedIndex: null };
