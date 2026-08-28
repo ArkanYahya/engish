@@ -3,6 +3,7 @@
 // framework rewrite must not lose it.
 
 export const THEME_KEY = "engish-quiz-theme";
+export const ACCENT_KEY = "engish-quiz-accent";
 export const UI_LANG_KEY = "engish-quiz-ui-lang";
 export const SELECTED_LEVEL_KEY = "engish-quiz-selected-level";
 export const ONBOARDING_KEY = "engish-quiz-onboarding-complete";
@@ -32,6 +33,24 @@ export function isDarkActive() {
   if (stored === "dark") return true;
   if (stored === "light") return false;
   return window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
+
+// Accent color (Violet/Red) is independent of the light/dark mode above — a learner on the
+// red accent can still switch between a light and dark surface, and vice versa.
+export function getStoredAccent() {
+  try {
+    return localStorage.getItem(ACCENT_KEY) === "red" ? "red" : "violet";
+  } catch {
+    return "violet";
+  }
+}
+
+export function setStoredAccent(value) {
+  try {
+    localStorage.setItem(ACCENT_KEY, value);
+  } catch {
+    // ignore — accent just won't persist across reloads
+  }
 }
 
 export function getStoredUiLang() {

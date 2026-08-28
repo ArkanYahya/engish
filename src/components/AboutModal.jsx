@@ -1,5 +1,5 @@
 import { IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon } from "@ionic/react";
-import { closeOutline, mailOutline, logoInstagram } from "ionicons/icons";
+import { closeOutline, mailOutline, heartOutline } from "ionicons/icons";
 
 import { useUiLang } from "../context/UiLangContext.jsx";
 
@@ -8,7 +8,6 @@ import { useUiLang } from "../context/UiLangContext.jsx";
 // out of sync with what actually shipped.
 const APP_VERSION = __APP_VERSION__;
 const DEVELOPER_EMAIL = "arkan.yahya.noah@gmail.com";
-const THANKS_INSTAGRAM_HANDLE = "_ixg8";
 
 // Reached from Settings ("About") — static info only, no preferences to change here.
 export default function AboutModal({ isOpen, onClose }) {
@@ -44,19 +43,10 @@ export default function AboutModal({ isOpen, onClose }) {
             </span>
           </a>
 
-          <a
-            className="about-thanks"
-            href={`https://instagram.com/${THANKS_INSTAGRAM_HANDLE}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <IonIcon icon={logoInstagram} />
-            <span>
-              {t("aboutThanks")}
-              <br />
-              <span dir="ltr">@{THANKS_INSTAGRAM_HANDLE}</span>
-            </span>
-          </a>
+          <div className="about-thanks">
+            <IonIcon icon={heartOutline} />
+            <span>{t("aboutThanks")}</span>
+          </div>
         </div>
       </div>
     </IonModal>

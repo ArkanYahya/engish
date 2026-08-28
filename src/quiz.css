@@ -983,13 +983,13 @@ ion-item.mistake-item {
   color: var(--text-tertiary);
 }
 
-.settings-lang-row {
+.settings-choice-row {
   display: flex;
   gap: 10px;
   padding: 4px 16px 10px;
 }
 
-.settings-lang-btn {
+.settings-choice-btn {
   flex: 1;
   border: 2px solid var(--line-strong);
   border-radius: 14px;
@@ -1002,11 +1002,11 @@ ion-item.mistake-item {
   cursor: pointer;
 }
 
-.settings-lang-btn:active {
+.settings-choice-btn:active {
   transform: scale(0.96);
 }
 
-.settings-lang-btn.active {
+.settings-choice-btn.active {
   border-color: var(--indigo);
   background: var(--indigo-soft);
   color: var(--indigo);

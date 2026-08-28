@@ -144,6 +144,57 @@
   --shadow-sheet: 0 -8px 24px rgba(0, 0, 0, 0.5);
 }
 
+/* Accent color (Violet/Red), picked independently of the light/dark mode above — an accent
+   swap moves the primary from indigo to a true red and shifts coral (the "wrong answer"
+   tint) toward amber so it stays visually distinct from the new red primary instead of the
+   two reading as the same color. Paper/ink/line tokens are untouched: only the accent-family
+   tokens are redeclared, and each is redeclared once for a light surface and once for a dark
+   one, mirroring the light/dark blocks above exactly (media-query fallback for "system dark,
+   no mode explicitly picked" + an explicit [data-theme="dark"] override). */
+:root[data-accent="red"] {
+  --indigo: #e0393f;
+  --indigo-shade: #b92c31;
+  --indigo-tint: #ec6d71;
+  --indigo-soft: #fdeceb;
+  --indigo-ink: #ffffff;
+
+  --coral: #ff8a00;
+  --coral-shade: #db7400;
+  --coral-tint: #ffa940;
+  --coral-soft: #fff1e0;
+  --coral-ink: #3a2400;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-accent="red"]:not([data-theme="light"]) {
+    --indigo: #ff7a7a;
+    --indigo-shade: #e35f5f;
+    --indigo-tint: #ffa3a3;
+    --indigo-soft: #3d2020;
+    --indigo-ink: #17151f;
+
+    --coral: #ffb340;
+    --coral-shade: #e0973a;
+    --coral-tint: #ffc670;
+    --coral-soft: #3d2c12;
+    --coral-ink: #17151f;
+  }
+}
+
+:root[data-accent="red"][data-theme="dark"] {
+  --indigo: #ff7a7a;
+  --indigo-shade: #e35f5f;
+  --indigo-tint: #ffa3a3;
+  --indigo-soft: #3d2020;
+  --indigo-ink: #17151f;
+
+  --coral: #ffb340;
+  --coral-shade: #e0973a;
+  --coral-tint: #ffc670;
+  --coral-soft: #3d2c12;
+  --coral-ink: #17151f;
+}
+
 /* ---- Bridge into Ionic's own component variables ---- */
 :root {
   --ion-font-family: var(--font-body);
