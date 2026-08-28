@@ -1,0 +1,485 @@
+/* Custom palette for pieces Ionic has no built-in equivalent for (score gauge, confetti,
+   the calendar-style stage grid, the correct/incorrect feedback box) — ported verbatim
+   from the vanilla version. Everything that DOES have a native Ionic component (buttons,
+   progress bar, lists, toolbars) now uses that instead of this custom CSS; see theme.css
+   for how the brand color feeds Ionic's own --ion-color-primary etc. */
+:root {
+  --card-bg: #ffffff;
+  --card-bg-subtle: #fafafa;
+  --text-primary: #1f2933;
+  --text-secondary: #6b7280;
+  --text-tertiary: #9ca3af;
+  --text-strong-muted: #374151;
+  --border: #e5e7eb;
+  --border-strong: #d1d5db;
+
+  --success-bg: #f0fdf4;
+  --success-border: #22c55e;
+  --success-border-soft: #bbf7d0;
+  --success-text: #166534;
+
+  --danger-bg: #fef2f2;
+  --danger-border: #ef4444;
+  --danger-border-soft: #fecaca;
+  --danger-text: #991b1b;
+
+  --locked-bg: #f3f4f6;
+  --locked-text: #9ca3af;
+  --locked-dot: #d1d5db;
+  --star: #eab308;
+
+  --shadow-sheet: 0 -8px 24px rgba(0, 0, 0, 0.18);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --card-bg: #1a1d24;
+    --card-bg-subtle: #20232b;
+    --text-primary: #f1f2f4;
+    --text-secondary: #9aa1ac;
+    --text-tertiary: #6b7280;
+    --text-strong-muted: #cbd2db;
+    --border: #2d313b;
+    --border-strong: #3a3f4b;
+
+    --success-bg: rgba(34, 197, 94, 0.12);
+    --success-border: #4ade80;
+    --success-border-soft: rgba(74, 222, 128, 0.35);
+    --success-text: #86efac;
+
+    --danger-bg: rgba(239, 68, 68, 0.12);
+    --danger-border: #f87171;
+    --danger-border-soft: rgba(248, 113, 113, 0.35);
+    --danger-text: #fca5a5;
+
+    --locked-bg: #20232b;
+    --locked-text: #6b7280;
+    --locked-dot: #3a3f4b;
+    --star: #facc15;
+
+    --shadow-sheet: 0 -8px 24px rgba(0, 0, 0, 0.55);
+  }
+}
+
+:root[data-theme="dark"] {
+  --card-bg: #1a1d24;
+  --card-bg-subtle: #20232b;
+  --text-primary: #f1f2f4;
+  --text-secondary: #9aa1ac;
+  --text-tertiary: #6b7280;
+  --text-strong-muted: #cbd2db;
+  --border: #2d313b;
+  --border-strong: #3a3f4b;
+
+  --success-bg: rgba(34, 197, 94, 0.12);
+  --success-border: #4ade80;
+  --success-border-soft: rgba(74, 222, 128, 0.35);
+  --success-text: #86efac;
+
+  --danger-bg: rgba(239, 68, 68, 0.12);
+  --danger-border: #f87171;
+  --danger-border-soft: rgba(248, 113, 113, 0.35);
+  --danger-text: #fca5a5;
+
+  --locked-bg: #20232b;
+  --locked-text: #6b7280;
+  --locked-dot: #3a3f4b;
+  --star: #facc15;
+
+  --shadow-sheet: 0 -8px 24px rgba(0, 0, 0, 0.55);
+}
+
+[lang="ar"] {
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+}
+
+.quiz-header-block {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+.quiz-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.quiz-header-links {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--ion-color-primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.quiz-header-subtitle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.quiz-header-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.quiz-header-chevron {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+[dir="rtl"] .quiz-header-chevron {
+  transform: scaleX(-1);
+}
+
+.quiz-card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 20px 16px;
+}
+
+.quiz-card.center {
+  text-align: center;
+}
+
+.question-text {
+  margin: 0 0 14px;
+  font-size: 19px;
+  line-height: 1.4;
+}
+
+.question-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.option-row ion-button {
+  flex: 1;
+  margin: 0;
+}
+
+/* Quiz options are content to read carefully (words/full sentences), not short button
+   labels — Ionic's default all-caps (Material Design convention) hurts readability here. */
+.option-row ion-button,
+.quiz-card ion-button {
+  text-transform: none;
+}
+
+.modal-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+  margin: 16px 0 4px;
+}
+
+.modal-label:first-child {
+  margin-top: 0;
+}
+
+.feedback {
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 16px 0;
+  font-size: 14px;
+  border: 1px solid transparent;
+}
+
+.feedback strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.feedback p {
+  margin: 0;
+}
+
+.feedback-ar {
+  margin-top: 8px !important;
+  padding-top: 8px;
+  border-top: 1px solid rgba(127, 127, 127, 0.25);
+  font-size: 14px;
+}
+
+.feedback-correct {
+  background: var(--success-bg);
+  color: var(--success-text);
+  border-color: var(--success-border-soft);
+}
+
+.feedback-incorrect {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  border-color: var(--danger-border-soft);
+}
+
+.score-gauge {
+  position: relative;
+  margin: 0 auto 20px;
+}
+
+.gauge-track {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 10;
+}
+
+.gauge-fill {
+  fill: none;
+  stroke: var(--ion-color-primary);
+  stroke-width: 10;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.7s ease;
+}
+
+.gauge-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.gauge-percent {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.gauge-score {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.sidebar-summary {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0 0 12px;
+}
+
+.results-message {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-strong-muted);
+  margin: 0 0 24px;
+  text-align: center;
+}
+
+.review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.review-item {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border-left: 4px solid;
+  font-size: 14px;
+}
+
+[dir="rtl"] .review-item {
+  border-left: none;
+  border-right: 4px solid;
+}
+
+.review-item.correct {
+  background: var(--success-bg);
+  border-color: var(--success-border);
+}
+
+.review-item.incorrect {
+  background: var(--danger-bg);
+  border-color: var(--danger-border);
+}
+
+.review-question {
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+.review-item p {
+  margin: 2px 0;
+}
+
+.stage-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 24px;
+  max-height: 320px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 14px;
+  text-align: start;
+}
+
+.stage-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.stage-row:last-child {
+  border-bottom: none;
+}
+
+/* Stage grid inside the stages bottom-sheet: sized and spaced like a month calendar's day
+   cells — small, tightly packed squares — so 50 stages read as one compact block. */
+.stage-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 14px;
+}
+
+.stage-box {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: var(--locked-bg);
+  color: var(--locked-text);
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: not-allowed;
+  padding: 0;
+}
+
+.stage-box.current {
+  background: var(--ion-color-primary-tint);
+  border-color: var(--ion-color-primary);
+  color: var(--ion-color-primary-shade);
+  cursor: pointer;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+}
+
+.stage-box.completed {
+  background: rgba(96, 165, 250, 0.15);
+  border-color: rgba(96, 165, 250, 0.5);
+  color: #1d4ed8;
+  cursor: pointer;
+}
+
+.stage-box.perfect {
+  background: var(--success-bg);
+  border-color: var(--success-border);
+  color: var(--success-text);
+  cursor: pointer;
+}
+
+.stage-box.perfect::after {
+  content: "★";
+  position: absolute;
+  top: -5px;
+  right: -4px;
+  font-size: 9px;
+  color: var(--star);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.dot.current {
+  background: var(--ion-color-primary);
+}
+
+.dot.completed {
+  background: #60a5fa;
+}
+
+.dot.perfect {
+  background: #4ade80;
+}
+
+.dot.locked {
+  background: var(--locked-dot);
+}
+
+.confetti-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20000;
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -12px;
+  width: 8px;
+  height: 14px;
+  opacity: 0.9;
+  border-radius: 2px;
+  animation-name: confettiFall;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
+  animation-fill-mode: forwards;
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) translateX(var(--drift)) rotate(540deg);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confetti-piece {
+    display: none;
+  }
+}

@@ -1,31 +1,15 @@
-import {
-  IonPage,
-  IonHeader,
-  IonToolbar,
-  IonButtons,
-  IonButton,
-  IonIcon,
-  IonContent,
-  IonCard,
-  IonCardContent,
-  IonBadge,
-  IonGrid,
-  IonRow,
-  IonCol,
-} from "@ionic/react";
-import { moonOutline, sunnyOutline, settingsOutline } from "ionicons/icons";
+import { IonPage, IonContent, IonCard, IonCardContent, IonBadge, IonGrid, IonRow, IonCol } from "@ionic/react";
 import { useNavigate } from "react-router-dom";
 
 import { LEVELS } from "../levels/index.js";
 import { LEVEL_TRANSLATIONS } from "../lib/strings.js";
 import { levelProgressSummary } from "../lib/quiz.js";
-import { useTheme } from "../context/ThemeContext.jsx";
 import { useUiLang } from "../context/UiLangContext.jsx";
 import { useQuiz } from "../context/QuizContext.jsx";
+import AppHeader from "../components/AppHeader.jsx";
 
 export default function LevelPicker() {
   const navigate = useNavigate();
-  const { isDark, toggleTheme } = useTheme();
   const { uiLang, t, rtlAttrs } = useUiLang();
   const { selectLevel } = useQuiz();
 
@@ -36,21 +20,7 @@ export default function LevelPicker() {
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar {...rtlAttrs}>
-          <IonButtons slot="start">
-            <IonButton>{t("appName")}</IonButton>
-          </IonButtons>
-          <IonButtons slot="end">
-            <IonButton onClick={toggleTheme} aria-label={isDark ? t("switchToLight") : t("switchToDark")}>
-              <IonIcon icon={isDark ? sunnyOutline : moonOutline} slot="icon-only" />
-            </IonButton>
-            <IonButton aria-label={t("settings")}>
-              <IonIcon icon={settingsOutline} slot="icon-only" />
-            </IonButton>
-          </IonButtons>
-        </IonToolbar>
-      </IonHeader>
+      <AppHeader />
       <IonContent className="ion-padding" {...rtlAttrs}>
         <h1>{t("chooseLevel")}</h1>
         <p>{t("chooseLevelSubtitle")}</p>

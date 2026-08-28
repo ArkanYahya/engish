@@ -17,6 +17,7 @@ import "@ionic/react/css/display.css";
 import "@ionic/react/css/palettes/dark.class.css";
 
 import "./theme.css";
+import "./quiz.css";
 import App from "./App.jsx";
 
 if ("serviceWorker" in navigator) {
