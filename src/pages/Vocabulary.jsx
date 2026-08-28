@@ -6,7 +6,7 @@ import { volumeHighOutline } from "ionicons/icons";
 import { useUiLang } from "../context/UiLangContext.jsx";
 import { getLevel } from "../levels/index.js";
 import { LEVEL_VOCABULARY } from "../lib/content.js";
-import { getVocabMistakeCount, isVocabWordRead, markVocabWordRead } from "../lib/storage.js";
+import { getVocabMistakeCount, isVocabWordMastered } from "../lib/storage.js";
 import { getAllVocabWords, getAllVocabularyAcrossLevels, getMistakenWords } from "../lib/vocabQuiz.js";
 import { speak } from "../lib/tts.js";
 import BottomTabBar from "../components/BottomTabBar.jsx";
@@ -18,12 +18,13 @@ export default function Vocabulary() {
   const { levelId } = useParams();
   const { t, isArabicUi, rtlAttrs } = useUiLang();
   const [activeWord, setActiveWord] = useState(null);
-  // null | "level" | "mistakes" — one modal instance serves both "Quiz Me" (this level's
-  // words) and "Review Mistakes" (every mistaken word across every level, since mistakes
-  // are stored level-agnostically — see lib/vocabQuiz.js).
+  // null | "level" | "reverse" | "mistakes" — one modal instance serves "Quiz Me" (this
+  // level, English prompt), "Reverse Quiz" (this level, Arabic prompt), and "Review
+  // Mistakes" (every mistaken word across every level, since mistakes are stored
+  // level-agnostically — see lib/vocabQuiz.js).
   const [quizMode, setQuizMode] = useState(null);
-  // Forces a re-read of mistake counts (localStorage, not React state) after the example
-  // modal or quiz modal changes them, so badges stay current without a full page reload.
+  // Forces a re-read of mistake/mastered status (localStorage, not React state) after the
+  // example modal or quiz modal changes them, so the list stays current without a reload.
   const [refreshKey, setRefreshKey] = useState(0);
 
   // Reads the level's static label directly, deliberately not through QuizContext — this
@@ -34,7 +35,6 @@ export default function Vocabulary() {
   const mistakenWords = getMistakenWords();
 
   function openExample(category, word) {
-    markVocabWordRead(category, word.en);
     setActiveWord({ ...word, category });
   }
 
@@ -57,9 +57,14 @@ export default function Vocabulary() {
         </div>
         <LevelPills activeLevelId={levelId} basePath="vocabulary" />
         <div className="ion-padding-horizontal quiz-me-actions">
-          <IonButton expand="block" onClick={() => setQuizMode("level")}>
-            {t("quizMe")}
-          </IonButton>
+          <div className="quiz-me-row">
+            <IonButton expand="block" onClick={() => setQuizMode("level")}>
+              {t("quizMe")}
+            </IonButton>
+            <IonButton expand="block" onClick={() => setQuizMode("reverse")}>
+              {t("reverseQuiz")}
+            </IonButton>
+          </div>
           <IonButton
             expand="block"
             fill="outline"
@@ -76,11 +81,13 @@ export default function Vocabulary() {
               <IonItemDivider {...rtlAttrs}>{isArabicUi ? group.categoryAr : group.category}</IonItemDivider>
               {group.words.map((w) => {
                 const missCount = getVocabMistakeCount(group.category, w.en);
-                const isRead = isVocabWordRead(group.category, w.en);
+                const isMastered = isVocabWordMastered(group.category, w.en);
                 // A currently-mistaken word gets the same light-red the main quiz uses for a
-                // wrong answer (--coral-soft) — takes priority over the "read" green tint,
-                // since it's the more actionable signal of the two.
-                const rowClass = missCount > 0 ? "mistake-item" : isRead ? "read-item" : "";
+                // wrong answer (--coral-soft) — takes priority over the "mastered" green
+                // tint, since it's the more actionable signal of the two. "Mastered" only
+                // lights up once the word's been answered correctly in a quiz, not just
+                // opened — see lib/storage.js.
+                const rowClass = missCount > 0 ? "mistake-item" : isMastered ? "mastered-item" : "";
                 return (
                   <IonItem
                     key={w.en}
@@ -122,7 +129,8 @@ export default function Vocabulary() {
         onDismiss={closeQuiz}
         targetWords={quizMode === "mistakes" ? mistakenWords : getAllVocabWords(vocabulary)}
         distractorWords={quizMode === "mistakes" ? getAllVocabularyAcrossLevels() : undefined}
-        title={quizMode === "mistakes" ? t("reviewMistakesTitle") : t("quizMe")}
+        title={quizMode === "mistakes" ? t("reviewMistakesTitle") : quizMode === "reverse" ? t("reverseQuiz") : t("quizMe")}
+        reverse={quizMode === "reverse"}
       />
       <BottomTabBar active="vocabulary" levelId={levelId} />
     </IonPage>

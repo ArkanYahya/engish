@@ -176,10 +176,16 @@
   margin-left: 10px;
 }
 
-/* Marks a vocabulary word or grammar topic the learner has already opened at least once —
-   reuses the app's existing "done"/positive green (same token as correct-answer feedback
-   and the perfect-stage dot) rather than introducing a new color. */
+/* Marks a grammar topic the learner has already opened at least once — reuses the app's
+   existing "done"/positive green (same token as correct-answer feedback and the
+   perfect-stage dot) rather than introducing a new color. */
 ion-item.read-item {
+  --background: var(--leaf-soft);
+}
+
+/* A vocabulary word answered correctly in a quiz at least once — same green as above, but
+   earned rather than just opened (see storage.js's vocab-mastered tracking). */
+ion-item.mastered-item {
   --background: var(--leaf-soft);
 }
 
@@ -205,6 +211,16 @@ ion-item.mistake-item {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.quiz-me-row {
+  display: flex;
+  gap: 10px;
+}
+
+.quiz-me-row > ion-button {
+  flex: 1;
+  margin: 0;
 }
 
 /* Level switcher on Vocabulary/Grammar — see components/LevelPills.jsx. */

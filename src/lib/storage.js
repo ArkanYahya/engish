@@ -6,7 +6,7 @@ export const THEME_KEY = "engish-quiz-theme";
 export const UI_LANG_KEY = "engish-quiz-ui-lang";
 export const SELECTED_LEVEL_KEY = "engish-quiz-selected-level";
 export const VOCAB_MISTAKES_KEY = "engish-quiz-vocab-mistakes";
-export const VOCAB_READ_KEY = "engish-quiz-vocab-read";
+export const VOCAB_MASTERED_KEY = "engish-quiz-vocab-mastered";
 export const GRAMMAR_READ_KEY = "engish-quiz-grammar-read";
 export const progressKeyFor = (levelId) => `engish-quiz-progress-${levelId}`;
 
@@ -118,34 +118,35 @@ export function bumpVocabMistake(category, en, delta) {
   localStorage.setItem(VOCAB_MISTAKES_KEY, JSON.stringify(mistakes));
 }
 
-// "Already read" tracking for the Vocabulary/Grammar reference lists — a word or topic is
-// marked the moment its detail sheet is opened, so a returning learner can see at a glance
-// what they've already been through. Categories are unique across every level (verified
-// when the A2/B1/B2 content was added), so vocab words don't need level-scoping the way
-// grammar topics do — a few topic names (e.g. "There is / There are") intentionally repeat
-// across levels, so those keys include levelId to keep them distinct.
+// "Mastered" tracking for the Vocabulary list — a word is marked the moment it's answered
+// correctly in any quiz mode (Quiz Me, Reverse Quiz, Review Mistakes), not just opened, so
+// the green highlight actually means "you've gotten this right," not just "you've looked at
+// it." Categories are unique across every level (verified when the A2/B1/B2 content was
+// added), so vocab words don't need level-scoping the way grammar topics do below.
 
-export function loadVocabRead() {
+export function loadVocabMastered() {
   try {
-    const raw = localStorage.getItem(VOCAB_READ_KEY);
+    const raw = localStorage.getItem(VOCAB_MASTERED_KEY);
     return raw ? JSON.parse(raw) : {};
   } catch {
     return {};
   }
 }
 
-export function isVocabWordRead(category, en) {
-  return !!loadVocabRead()[vocabWordKey(category, en)];
+export function isVocabWordMastered(category, en) {
+  return !!loadVocabMastered()[vocabWordKey(category, en)];
 }
 
-export function markVocabWordRead(category, en) {
-  const read = loadVocabRead();
+export function markVocabWordMastered(category, en) {
+  const mastered = loadVocabMastered();
   const key = vocabWordKey(category, en);
-  if (read[key]) return;
-  read[key] = true;
-  localStorage.setItem(VOCAB_READ_KEY, JSON.stringify(read));
+  if (mastered[key]) return;
+  mastered[key] = true;
+  localStorage.setItem(VOCAB_MASTERED_KEY, JSON.stringify(mastered));
 }
 
+// Grammar topics keep the original "read = opened" tracking — there's no quiz to answer
+// correctly for a topic, so "you've looked at this" is the only signal available.
 const grammarTopicKey = (levelId, topic) => `${levelId}::${topic}`;
 
 export function loadGrammarRead() {

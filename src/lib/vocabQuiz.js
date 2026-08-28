@@ -39,5 +39,12 @@ export function pickVocabQuizQuestion(targetWords, distractorWords = targetWords
   const distractorPool = distractorWords.filter((w) => w.ar !== correctWord.ar);
   const distractors = shuffleRandomly(distractorPool).slice(0, 3);
   const options = shuffleRandomly([correctWord, ...distractors]);
-  return { word: correctWord.en, category: correctWord.category, correctAr: correctWord.ar, options, pickedIndex: null };
+  return {
+    word: correctWord.en,
+    wordAr: correctWord.ar,
+    category: correctWord.category,
+    correctAr: correctWord.ar,
+    options,
+    pickedIndex: null,
+  };
 }
