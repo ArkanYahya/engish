@@ -615,11 +615,14 @@ h2 {
   line-height: 1.4;
 }
 
+/* Stacked, not a side-by-side row: the question shares its row with two action buttons
+   (speak + translate), and without giving it real room to shrink, long questions were
+   getting squeezed into a narrow column and wrapping into far more lines than needed.
+   Putting the question on its own full-width line first fixes that outright. */
 .question-row {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
+  flex-direction: column;
+  gap: 10px;
   margin-bottom: 20px;
 }
 
@@ -1144,9 +1147,173 @@ h2 {
   }
 }
 
+.vocab-page {
+  background: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  padding: 32px;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  animation: fadeSlideUp 0.3s ease;
+}
+
+.vocab-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.vocab-header h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.vocab-back-btn .icon {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .vocab-back-btn .icon {
+  transform: none;
+}
+
+.vocab-subtitle {
+  margin: 0 0 24px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.vocab-category {
+  margin-bottom: 22px;
+}
+
+.vocab-category:last-child {
+  margin-bottom: 0;
+}
+
+.vocab-category h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-strong-muted);
+}
+
+.vocab-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vocab-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card-bg-subtle);
+}
+
+.vocab-word {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.vocab-en {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.vocab-ar {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Mistake badge: shows how many times a word was recently missed in "Quiz Me".
+   Fixed, theme-independent colors (like --success-dot) so severity reads the same
+   in light and dark mode — tier scales amber -> orange -> red as the count climbs. */
+.vocab-mistake-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.vocab-mistake-badge.tier-1 {
+  background: #f59e0b;
+}
+
+.vocab-mistake-badge.tier-2 {
+  background: #f97316;
+}
+
+.vocab-mistake-badge.tier-3 {
+  background: #ef4444;
+}
+
+.vocab-speak-btn {
+  flex-shrink: 0;
+}
+
+.vocab-quiz-trigger-btn {
+  margin-bottom: 24px;
+}
+
+.vocab-quiz-box {
+  text-align: center;
+}
+
+.vocab-quiz-score {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 4px 0 16px;
+}
+
+.vocab-quiz-word-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.vocab-quiz-word {
+  margin: 0;
+  font-size: 26px;
+}
+
+.vocab-quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.vocab-quiz-options .option {
+  text-align: center;
+}
+
+.vocab-quiz-next-btn {
+  margin-top: 4px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .quiz-card,
   .level-picker,
+  .vocab-page,
   .feedback,
   .modal-box {
     animation: none;

@@ -1,4 +1,5 @@
 import { LEVELS, getLevel } from "./levels/index.js";
+import { VOCABULARY } from "./levels/a1-vocabulary.js";
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
@@ -107,6 +108,13 @@ const STRINGS = {
     switchToLight: "Switch to light mode",
     switchToDark: "Switch to dark mode",
     switchUiLang: "عربي",
+    vocabulary: "Vocabulary",
+    vocabularyTitle: "A1 Vocabulary",
+    vocabularySubtitle: "Browse core words from the A1 level, with Arabic meanings and pronunciation.",
+    quizMe: "Quiz Me",
+    vocabQuizNext: "Next Word",
+    vocabQuizScore: (score, total) => `Score: ${score}/${total}`,
+    missedTimes: (count) => `Missed ${count} time${count === 1 ? "" : "s"} recently`,
     stagesTitle: "Stages",
     stagesCompleteOf: (done, total) => `${done} / ${total} complete`,
     legendCurrent: "Current",
@@ -158,6 +166,13 @@ const STRINGS = {
     switchToLight: "التبديل إلى الوضع الفاتح",
     switchToDark: "التبديل إلى الوضع الداكن",
     switchUiLang: "English",
+    vocabulary: "المفردات",
+    vocabularyTitle: "مفردات المستوى A1",
+    vocabularySubtitle: "تصفح الكلمات الأساسية لمستوى A1، مع معانيها بالعربية ونطقها.",
+    quizMe: "اختبرني",
+    vocabQuizNext: "الكلمة التالية",
+    vocabQuizScore: (score, total) => `النتيجة: ${score}/${total}`,
+    missedTimes: (count) => `أخطأت بها ${count} ${count === 1 ? "مرة" : "مرات"} مؤخرًا`,
     stagesTitle: "المراحل",
     stagesCompleteOf: (done, total) => `${done} / ${total} مكتملة`,
     legendCurrent: "الحالية",
@@ -261,6 +276,9 @@ function rerenderCurrentScreen() {
       break;
     case "results":
       renderResults();
+      break;
+    case "vocabulary":
+      renderVocabulary();
       break;
     default:
       renderLevelPicker();
@@ -409,12 +427,14 @@ function renderHeader(subtitle) {
         <div class="header-actions">
           <button class="icon-btn theme-toggle-btn" type="button">${isDarkActive() ? icon("sun") : icon("moon")}</button>
           <button id="ui-lang-toggle-btn" class="link-btn desktop-only">${t("switchUiLang")}</button>
+          <button id="vocabulary-btn" class="link-btn desktop-only">${t("vocabulary")}</button>
           <button id="change-level-btn" class="link-btn desktop-only">${t("changeLevel")}</button>
           <button id="start-over-btn" class="link-btn desktop-only">${t("startOver")}</button>
           <div class="header-menu mobile-only">
             <button id="header-menu-btn" class="icon-btn" type="button" aria-label="${t("menu")}">${icon("moreVertical")}</button>
             <div class="header-menu-panel" id="header-menu-panel">
               <button id="ui-lang-toggle-btn-mobile" class="header-menu-item" type="button">${t("switchUiLang")}</button>
+              <button id="vocabulary-btn-mobile" class="header-menu-item" type="button">${t("vocabulary")}</button>
               <button id="change-level-btn-mobile" class="header-menu-item" type="button">${t("changeLevel")}</button>
               <button id="start-over-btn-mobile" class="header-menu-item" type="button">${t("startOver")}</button>
             </div>
@@ -431,9 +451,11 @@ function attachHeaderEvents() {
   document.getElementById("start-over-btn").addEventListener("click", resetProgress);
   document.getElementById("change-level-btn").addEventListener("click", renderLevelPicker);
   document.getElementById("ui-lang-toggle-btn").addEventListener("click", toggleUiLang);
+  document.getElementById("vocabulary-btn").addEventListener("click", renderVocabulary);
   document.getElementById("start-over-btn-mobile").addEventListener("click", resetProgress);
   document.getElementById("change-level-btn-mobile").addEventListener("click", renderLevelPicker);
   document.getElementById("ui-lang-toggle-btn-mobile").addEventListener("click", toggleUiLang);
+  document.getElementById("vocabulary-btn-mobile").addEventListener("click", renderVocabulary);
   document.getElementById("header-menu-btn").addEventListener("click", (e) => {
     e.stopPropagation();
     document.getElementById("header-menu-panel").classList.toggle("open");
@@ -882,6 +904,219 @@ function renderResults(justCompleted) {
   if (justCompleted) celebrate();
 
   document.getElementById("restart-btn").addEventListener("click", resetProgress);
+}
+
+// Standalone reference screen (not tied to quiz progress) — reachable from any quiz
+// screen via the header menu. Remembers whichever screen it was opened from so the
+// back button returns there, and so a language toggle mid-view re-renders correctly.
+let vocabularyReturnView = { name: "levelPicker" };
+
+// Tracks recent struggle with individual vocabulary words, based on answers given in the
+// "Quiz Me" mini-quiz: a wrong answer nudges a word's count up, a later correct answer
+// nudges it back down (floored at 0) — so the indicator reflects recent trouble, not a
+// lifetime tally. Keyed by category+word (not just the English word) because a couple of
+// words repeat across categories with different meanings — e.g. "orange" is both a fruit
+// (Food) and a color (Colors) — and those must not share a counter.
+const VOCAB_MISTAKES_KEY = "engish-quiz-vocab-mistakes";
+const vocabWordKey = (category, en) => `${category}::${en}`;
+
+function loadVocabMistakes() {
+  try {
+    const raw = localStorage.getItem(VOCAB_MISTAKES_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function getVocabMistakeCount(category, en) {
+  return loadVocabMistakes()[vocabWordKey(category, en)] || 0;
+}
+
+function bumpVocabMistake(category, en, delta) {
+  const mistakes = loadVocabMistakes();
+  const key = vocabWordKey(category, en);
+  const next = Math.max(0, (mistakes[key] || 0) + delta);
+  if (next === 0) delete mistakes[key];
+  else mistakes[key] = next;
+  localStorage.setItem(VOCAB_MISTAKES_KEY, JSON.stringify(mistakes));
+}
+
+// `preserveReturn` is used when refreshing the list in place (e.g. after the quiz modal
+// closes, to pick up updated mistake badges) — a normal navigation into this screen should
+// remember where it came from, but a same-screen refresh must not overwrite that memory.
+function renderVocabulary(preserveReturn = false) {
+  if (!preserveReturn) vocabularyReturnView = currentView;
+  currentView = { name: "vocabulary" };
+
+  const sections = VOCABULARY.map((group) => {
+    const catName = isArabicUi() ? group.categoryAr : group.category;
+    const rows = group.words
+      .map((w, i) => {
+        const missCount = getVocabMistakeCount(group.category, w.en);
+        const tier = Math.min(missCount, 3);
+        const badge =
+          missCount > 0
+            ? `<span class="vocab-mistake-badge tier-${tier}" title="${t("missedTimes", missCount)}">${missCount}</span>`
+            : "";
+        return `
+          <div class="vocab-row">
+            <div class="vocab-word">
+              <span class="vocab-en">${w.en}</span>
+              ${badge}
+              <span class="vocab-ar" dir="rtl" lang="ar">${w.ar}</span>
+            </div>
+            <button class="icon-btn vocab-speak-btn" data-en="${w.en.replace(/"/g, "&quot;")}" type="button" title="${t("listenToOption")}" aria-label="${t("listenToOption")}">${icon("speaker")}</button>
+          </div>
+        `;
+      })
+      .join("");
+    return `
+      <div class="vocab-category">
+        <h3 ${rtlAttrs()}>${catName}</h3>
+        <div class="vocab-list" dir="ltr">${rows}</div>
+      </div>
+    `;
+  }).join("");
+
+  app.innerHTML = `
+    <div class="vocab-page" ${rtlAttrs()}>
+      <div class="vocab-header">
+        <button class="icon-btn vocab-back-btn" type="button" aria-label="${t("back")}">${icon("chevronRight")}</button>
+        <h1>${t("vocabularyTitle")}</h1>
+      </div>
+      <p class="vocab-subtitle">${t("vocabularySubtitle")}</p>
+      <button class="next-btn vocab-quiz-trigger-btn" type="button">${t("quizMe")}</button>
+      ${sections}
+    </div>
+  `;
+
+  document.querySelector(".vocab-back-btn").addEventListener("click", () => {
+    currentView = vocabularyReturnView;
+    rerenderCurrentScreen();
+  });
+
+  document.querySelectorAll(".vocab-speak-btn").forEach((btn) => {
+    btn.addEventListener("click", () => speak(btn.dataset.en));
+  });
+
+  document.querySelector(".vocab-quiz-trigger-btn").addEventListener("click", openVocabQuizModal);
+}
+
+const ALL_VOCAB_WORDS = VOCABULARY.flatMap((group) =>
+  group.words.map((w) => ({ ...w, category: group.category }))
+);
+
+function shuffleRandomly(arr) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+// Unlike the main quiz (which must stay deterministic so saved progress lines up with
+// question indices), this mini quiz has no persisted state at all — genuine Math.random()
+// is fine and is what the user asked for.
+function pickVocabQuizQuestion() {
+  const correctWord = ALL_VOCAB_WORDS[Math.floor(Math.random() * ALL_VOCAB_WORDS.length)];
+  const distractorPool = ALL_VOCAB_WORDS.filter((w) => w.ar !== correctWord.ar);
+  const distractors = shuffleRandomly(distractorPool).slice(0, 3);
+  const options = shuffleRandomly([correctWord, ...distractors]);
+  return { word: correctWord.en, category: correctWord.category, correctAr: correctWord.ar, options, pickedIndex: null };
+}
+
+function openVocabQuizModal() {
+  let score = 0;
+  let total = 0;
+  let current = pickVocabQuizQuestion();
+
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  document.body.appendChild(overlay);
+
+  function close() {
+    document.removeEventListener("keydown", onKey);
+    overlay.remove();
+    // Refresh the list behind the modal so any mistake badges picked up during this
+    // session are visible immediately, without disturbing the back-button's memory
+    // of which screen opened the vocabulary page.
+    if (currentView.name === "vocabulary") renderVocabulary(true);
+  }
+  function onKey(e) {
+    if (e.key === "Escape") close();
+  }
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) close();
+  });
+  document.addEventListener("keydown", onKey);
+
+  function renderModalContent() {
+    const answered = current.pickedIndex !== null;
+    const isCorrect = answered && current.options[current.pickedIndex].ar === current.correctAr;
+
+    overlay.innerHTML = `
+      <div class="modal-box vocab-quiz-box" ${rtlAttrs()}>
+        <button class="modal-close" aria-label="${t("close")}">${icon("x")}</button>
+        <p class="modal-label">${t("quizMe")}</p>
+        <p class="vocab-quiz-score">${t("vocabQuizScore", score, total)}</p>
+        <div class="vocab-quiz-word-row">
+          <h2 class="vocab-quiz-word">${current.word}</h2>
+          <button class="icon-btn vocab-quiz-speak-btn" type="button" title="${t("listenToOption")}" aria-label="${t("listenToOption")}">${icon("speaker")}</button>
+        </div>
+        <div class="vocab-quiz-options">
+          ${current.options
+            .map((opt, i) => {
+              let cls = "option";
+              if (answered) {
+                cls += " locked";
+                if (opt.ar === current.correctAr) cls += " correct";
+                else if (i === current.pickedIndex) cls += " incorrect";
+              }
+              return `<button class="${cls}" data-index="${i}" dir="rtl" lang="ar" ${answered ? "disabled" : ""}>${opt.ar}</button>`;
+            })
+            .join("")}
+        </div>
+        ${
+          answered
+            ? `<div class="feedback ${isCorrect ? "feedback-correct" : "feedback-incorrect"}">
+                <strong ${rtlAttrs()}>${isCorrect ? t("correct") : t("notQuite")}</strong>
+              </div>`
+            : ""
+        }
+        <button class="next-btn vocab-quiz-next-btn" type="button" ${answered ? "" : "disabled"}>${t("vocabQuizNext")}</button>
+      </div>
+    `;
+
+    overlay.querySelector(".modal-close").addEventListener("click", close);
+    overlay.querySelector(".vocab-quiz-speak-btn").addEventListener("click", () => speak(current.word));
+
+    if (!answered) {
+      overlay.querySelectorAll(".vocab-quiz-options .option").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const idx = Number(btn.dataset.index);
+          current.pickedIndex = idx;
+          total += 1;
+          if (current.options[idx].ar === current.correctAr) {
+            score += 1;
+            bumpVocabMistake(current.category, current.word, -1);
+          } else {
+            bumpVocabMistake(current.category, current.word, 1);
+          }
+          renderModalContent();
+        });
+      });
+    }
+
+    overlay.querySelector(".vocab-quiz-next-btn").addEventListener("click", () => {
+      if (current.pickedIndex === null) return;
+      current = pickVocabQuizQuestion();
+      renderModalContent();
+    });
+  }
+
+  renderModalContent();
 }
 
 const savedLevelId = localStorage.getItem(SELECTED_LEVEL_KEY);
