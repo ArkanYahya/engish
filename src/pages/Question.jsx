@@ -6,6 +6,7 @@ import { volumeHighOutline, globeOutline, closeOutline, appsOutline, checkmarkCi
 import { useQuiz } from "../context/QuizContext.jsx";
 import { useUiLang } from "../context/UiLangContext.jsx";
 import { speak } from "../lib/tts.js";
+import { playErrorSound } from "../lib/sound.js";
 import { stageOf } from "../lib/quiz.js";
 import StageSheet from "../components/StageSheet.jsx";
 import TranslationModal from "../components/TranslationModal.jsx";
@@ -60,7 +61,11 @@ export default function Question() {
       answers[prev.current] = index;
       return { ...prev, answers };
     });
-    speak(q.options[index]);
+    if (index === q.answer) {
+      speak(q.options[index]);
+    } else {
+      playErrorSound();
+    }
   }
 
   function goNext() {

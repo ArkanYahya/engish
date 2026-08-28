@@ -3,6 +3,7 @@ import { IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIc
 import { closeOutline, volumeHighOutline } from "ionicons/icons";
 import { useUiLang } from "../context/UiLangContext.jsx";
 import { speak } from "../lib/tts.js";
+import { playErrorSound } from "../lib/sound.js";
 import { bumpVocabMistake, markVocabWordMastered } from "../lib/storage.js";
 import { pickVocabQuizQuestion } from "../lib/vocabQuiz.js";
 
@@ -16,9 +17,18 @@ export default function VocabQuizModal({ isOpen, onDismiss, targetWords, distrac
   const { t, rtlAttrs } = useUiLang();
   const [current, setCurrent] = useState(null);
 
+  function nextQuestion() {
+    const question = pickVocabQuizQuestion(targetWords, distractorWords);
+    setCurrent(question);
+    // The prompt is only in English when not in reverse mode — Arabic prompts stay silent,
+    // same rule as everywhere else in the app (the TTS engine only speaks English).
+    if (!reverse) speak(question.word);
+    return question;
+  }
+
   useEffect(() => {
     if (isOpen && targetWords.length > 0) {
-      setCurrent(pickVocabQuizQuestion(targetWords, distractorWords));
+      nextQuestion();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
@@ -31,8 +41,12 @@ export default function VocabQuizModal({ isOpen, onDismiss, targetWords, distrac
     if (correct) {
       bumpVocabMistake(current.category, current.word, -1);
       markVocabWordMastered(current.category, current.word);
+      // Only the reverse-quiz options are English words worth reading back; the normal
+      // mode's options are Arabic, which the engine can't speak.
+      if (reverse) speak(current.options[idx].en);
     } else {
       bumpVocabMistake(current.category, current.word, 1);
+      if (reverse) playErrorSound();
     }
     setCurrent({ ...current, pickedIndex: idx });
   }
@@ -104,11 +118,7 @@ export default function VocabQuizModal({ isOpen, onDismiss, targetWords, distrac
             );
           })}
 
-          <IonButton
-            expand="block"
-            disabled={!answered}
-            onClick={() => setCurrent(pickVocabQuizQuestion(targetWords, distractorWords))}
-          >
+          <IonButton expand="block" disabled={!answered} onClick={nextQuestion}>
             {t("vocabQuizNext")}
           </IonButton>
         </IonContent>
