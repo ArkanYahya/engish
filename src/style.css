@@ -11,7 +11,16 @@ body {
   background: #f4f5f7;
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   color: #1f2933;
-  padding: 24px;
+  padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom))
+    max(24px, env(safe-area-inset-left));
+}
+
+.desktop-only {
+  display: inline-flex;
+}
+
+.mobile-only {
+  display: none;
 }
 
 #app {
@@ -152,17 +161,99 @@ body {
   background: #d1d5db;
 }
 
+.stage-bar {
+  display: none;
+}
+
+.sidebar-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.icon-btn.sidebar-close-btn {
+  display: none;
+}
+
+.sidebar-backdrop {
+  display: none;
+}
+
 @media (max-width: 700px) {
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-only {
+    display: inline-flex;
+  }
+
   .layout {
     flex-direction: column;
   }
 
+  /* The stage grid becomes a bottom-sheet on mobile instead of stacking inline —
+     it's the same .sidebar element as desktop, just repositioned and hidden until opened. */
   .sidebar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
     width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.18);
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    transform: translateY(110%);
+    transition: transform 0.25s ease;
+    z-index: 1000;
+  }
+
+  .sidebar.open {
+    transform: translateY(0);
+  }
+
+  .sidebar.open ~ .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 17, 21, 0.45);
+    z-index: 999;
+  }
+
+  .icon-btn.sidebar-close-btn {
+    display: flex;
   }
 
   .stage-grid {
-    grid-template-columns: repeat(10, 1fr);
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .stage-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #374151;
+    cursor: pointer;
+  }
+
+  .stage-bar-chevron {
+    color: #9ca3af;
+    font-size: 16px;
+  }
+
+  .next-btn {
+    position: sticky;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
   }
 }
 
@@ -213,6 +304,46 @@ body {
   display: flex;
   align-items: center;
   gap: 14px;
+}
+
+.header-menu {
+  position: relative;
+}
+
+.header-menu-panel {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 160px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  padding: 6px;
+  z-index: 20;
+}
+
+.header-menu-panel.open {
+  display: flex;
+  flex-direction: column;
+}
+
+.header-menu-item {
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 9px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+}
+
+.header-menu-item:hover {
+  background: #f3f4f6;
+  color: #4f46e5;
 }
 
 .link-btn {

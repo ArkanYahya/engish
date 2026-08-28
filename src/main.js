@@ -149,8 +149,15 @@ function renderHeader(subtitle) {
       <div class="header-top">
         <span class="brand">English Quiz <span class="level-tag">${currentLevel.label}</span></span>
         <div class="header-actions">
-          <button id="change-level-btn" class="link-btn">Change Level</button>
-          <button id="start-over-btn" class="link-btn">Start Over</button>
+          <button id="change-level-btn" class="link-btn desktop-only">Change Level</button>
+          <button id="start-over-btn" class="link-btn desktop-only">Start Over</button>
+          <div class="header-menu mobile-only">
+            <button id="header-menu-btn" class="icon-btn" type="button" aria-label="Menu">⋯</button>
+            <div class="header-menu-panel" id="header-menu-panel">
+              <button id="change-level-btn-mobile" class="header-menu-item" type="button">Change Level</button>
+              <button id="start-over-btn-mobile" class="header-menu-item" type="button">Start Over</button>
+            </div>
+          </div>
         </div>
       </div>
       <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
@@ -162,7 +169,24 @@ function renderHeader(subtitle) {
 function attachHeaderEvents() {
   document.getElementById("start-over-btn").addEventListener("click", resetProgress);
   document.getElementById("change-level-btn").addEventListener("click", renderLevelPicker);
+  document.getElementById("start-over-btn-mobile").addEventListener("click", resetProgress);
+  document.getElementById("change-level-btn-mobile").addEventListener("click", renderLevelPicker);
+  document.getElementById("header-menu-btn").addEventListener("click", (e) => {
+    e.stopPropagation();
+    document.getElementById("header-menu-panel").classList.toggle("open");
+  });
 }
+
+// Attached once for the app's lifetime (not per render) so it never accumulates
+// duplicate listeners on `document` across re-renders.
+document.addEventListener("click", (e) => {
+  const menuBtn = document.getElementById("header-menu-btn");
+  const menuPanel = document.getElementById("header-menu-panel");
+  if (!menuBtn || !menuPanel) return;
+  if (!menuPanel.contains(e.target) && e.target !== menuBtn) {
+    menuPanel.classList.remove("open");
+  }
+});
 
 function renderSidebar() {
   const boxes = [];
@@ -192,8 +216,11 @@ function renderSidebar() {
   ).length;
 
   return `
-    <aside class="sidebar">
-      <div class="sidebar-title">Stages</div>
+    <aside class="sidebar" id="stage-sidebar">
+      <div class="sidebar-header-row">
+        <div class="sidebar-title">Stages</div>
+        <button class="icon-btn sidebar-close-btn" id="sidebar-close-btn" type="button" aria-label="Close">✕</button>
+      </div>
       <div class="sidebar-summary">${doneCount} / ${TOTAL_STAGES} complete</div>
       <div class="stage-grid">${boxes.join("")}</div>
       <div class="legend">
@@ -203,6 +230,22 @@ function renderSidebar() {
         <span><i class="dot locked"></i> Locked</span>
       </div>
     </aside>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  `;
+}
+
+// Mobile-only compact bar shown in place of the full stage grid; tapping it opens
+// the grid as a bottom-sheet (the same .sidebar element, repositioned via CSS).
+function renderStageBar() {
+  const doneCount = Array.from({ length: TOTAL_STAGES }, (_, s) => stageStatus(s)).filter(
+    (st) => st === "perfect" || st === "completed"
+  ).length;
+  const currentStageNum = stageOf(state.current) + 1;
+  return `
+    <button class="stage-bar" id="stage-bar-btn" type="button">
+      <span class="stage-bar-text"><strong>Stage ${currentStageNum}</strong> of ${TOTAL_STAGES} &middot; ${doneCount} complete</span>
+      <span class="stage-bar-chevron">›</span>
+    </button>
   `;
 }
 
@@ -219,6 +262,19 @@ function attachSidebarEvents() {
       }
     });
   });
+
+  const sidebarEl = document.getElementById("stage-sidebar");
+  const backdrop = document.getElementById("sidebar-backdrop");
+  const stageBarBtn = document.getElementById("stage-bar-btn");
+  const closeBtn = document.getElementById("sidebar-close-btn");
+  if (!sidebarEl || !backdrop) return;
+
+  const openSheet = () => sidebarEl.classList.add("open");
+  const closeSheet = () => sidebarEl.classList.remove("open");
+
+  stageBarBtn?.addEventListener("click", openSheet);
+  backdrop.addEventListener("click", closeSheet);
+  closeBtn?.addEventListener("click", closeSheet);
 }
 
 function speakableText(text) {
@@ -274,6 +330,7 @@ function renderQuestion() {
         ${renderHeader(
           `Stage ${stageIndex + 1} of ${TOTAL_STAGES} &middot; Question ${posInStage} of ${STAGE_SIZE} &middot; Overall ${state.current + 1}/${TOTAL_QUESTIONS}`
         )}
+        ${renderStageBar()}
         <div class="quiz-card">
           <div class="question-row">
             <h2>${q.question}</h2>
@@ -380,6 +437,7 @@ function renderStageComplete(stageIndex) {
       ${renderSidebar()}
       <div class="main-panel">
         ${renderHeader(`Stage ${stageIndex + 1} of ${TOTAL_STAGES} complete`)}
+        ${renderStageBar()}
         <div class="quiz-card center">
           <h2>Stage ${stageIndex + 1} Complete!</h2>
           <p class="stage-score">Score: ${score} / ${STAGE_SIZE}</p>
@@ -421,6 +479,7 @@ function renderStageReview(stageIndex) {
       ${renderSidebar()}
       <div class="main-panel">
         ${renderHeader(`Reviewing Stage ${stageIndex + 1}`)}
+        ${renderStageBar()}
         <div class="quiz-card">
           <h2>Stage ${stageIndex + 1} Review — ${score} / ${STAGE_SIZE}</h2>
           <div class="review-list">${items.join("")}</div>
@@ -462,6 +521,7 @@ function renderResults() {
       ${renderSidebar()}
       <div class="main-panel">
         ${renderHeader("Quiz complete")}
+        ${renderStageBar()}
         <div class="quiz-card">
           <h2>Final Score: ${score} / ${TOTAL_QUESTIONS}</h2>
           <div class="stage-breakdown">
