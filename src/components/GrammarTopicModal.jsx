@@ -3,6 +3,7 @@ import { IonModal, IonHeader, IonToolbar, IonButtons, IonButton, IonIcon, IonCon
 import { closeOutline, volumeHighOutline, globeOutline } from "ionicons/icons";
 import { useUiLang } from "../context/UiLangContext.jsx";
 import { speak } from "../lib/tts.js";
+import { bidiSafe } from "../lib/bidi.jsx";
 
 // Shows the rule plus a few example sentences, Arabic hidden until asked for — one toggle
 // reveals the rule's translation and every example's translation together, rather than a
@@ -26,7 +27,7 @@ export default function GrammarTopicModal({ topic, onDismiss }) {
   return (
     <IonModal isOpen={!!topic} onDidDismiss={onDismiss} initialBreakpoint={0.6} breakpoints={[0, 0.6, 0.95]}>
       <IonHeader>
-        <IonToolbar {...rtlAttrs}>
+        <IonToolbar className="close-only-toolbar" {...rtlAttrs}>
           <IonButtons slot="end">
             <IonButton onClick={onDismiss} aria-label={t("close")}>
               <IonIcon icon={closeOutline} slot="icon-only" />
@@ -49,7 +50,7 @@ export default function GrammarTopicModal({ topic, onDismiss }) {
           </div>
           {revealed && (
             <p className="grammar-rule-ar" dir="rtl" lang="ar">
-              {displayTopic.ruleAr}
+              {bidiSafe(displayTopic.ruleAr)}
             </p>
           )}
 
@@ -68,7 +69,7 @@ export default function GrammarTopicModal({ topic, onDismiss }) {
               </div>
               {revealed && (
                 <p className="grammar-example-ar" dir="rtl" lang="ar">
-                  {ex.ar}
+                  {bidiSafe(ex.ar)}
                 </p>
               )}
             </div>

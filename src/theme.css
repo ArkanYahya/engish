@@ -203,6 +203,40 @@ ion-title,
 ion-button {
   text-transform: none;
   --border-radius: 14px;
+  --box-shadow: none;
+}
+
+/* Compact, low-chrome toolbars everywhere. Ionic's defaults — an opaque paper-raised
+   background, an ios-mode shadow line, and a fairly tall min-height — read as a separate
+   gray/white block sitting on top of the page instead of feeling integrated. A background
+   flush with the page/sheet behind it, a hairline border instead of a shadow, and a
+   trimmed height fix both plain back-nav headers (Vocabulary, Grammar) and modal/sheet
+   headers (Settings, Translation, Stages, the Vocabulary/Grammar detail sheets) the same
+   way, for one consistent nav language everywhere. */
+ion-header {
+  box-shadow: none;
+}
+
+ion-header::after {
+  display: none;
+}
+
+ion-toolbar {
+  --background: var(--paper);
+  --border-width: 0 0 1px 0;
+  --border-color: var(--line);
+  --min-height: 44px;
+}
+
+ion-back-button {
+  --padding-start: 6px;
+  --padding-end: 6px;
+}
+
+/* A toolbar with nothing in it but a close button (the vocab/grammar detail sheets, the
+   translation popup) doesn't need a full toolbar's height reserved for empty space. */
+.close-only-toolbar {
+  --min-height: 36px;
 }
 
 /* A centered "popup" dialog instead of Ionic's default sheet/full-screen presentation —

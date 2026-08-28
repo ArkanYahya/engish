@@ -93,6 +93,18 @@
   font-size: 15.5px;
 }
 
+/* A not-yet-picked option should read as a quiet, neutral choice, not a "loud" primary-
+   colored one — Ionic's default outline button (no `color` prop set) borrows the primary
+   brand color for its border and text, which looked like every option was already
+   selected/active before you'd touched anything. Targets only the pre-answer state:
+   IonButton only gets the "ion-color" host class once Question.jsx sets color="success"/
+   "danger"/"medium" after an answer is picked, so this never touches those states. */
+.option-row ion-button:not(.ion-color) {
+  --border-width: 1px;
+  --border-color: var(--line-strong);
+  --color: var(--ink);
+}
+
 .feedback-band {
   padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
   background: var(--leaf-soft);
@@ -132,7 +144,7 @@
   font-family: var(--font-ar);
   font-size: 13px;
   color: var(--ink-faint);
-  margin: 0 0 16px;
+  margin: 0 0 22px;
 }
 
 .option-row {
@@ -252,6 +264,16 @@
   font-size: 14px;
   color: var(--text-secondary);
   line-height: 1.6;
+}
+
+/* English terms embedded in Arabic rule/example text (see lib/bidi.jsx) are wrapped in
+   <bdi> to keep them correctly ordered — but the source Arabic often attaches directly to
+   them with no space (e.g. "وyour"), which without a gap can visually read as one fused
+   word. A small margin keeps English and Arabic clearly separated wherever they meet. */
+.grammar-rule-ar bdi,
+.grammar-example-ar bdi,
+.grammar-topic-ar bdi {
+  margin: 0 3px;
 }
 
 .grammar-examples-label {

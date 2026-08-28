@@ -26,7 +26,7 @@ export default function VocabExampleModal({ word, onDismiss }) {
   return (
     <IonModal isOpen={!!word} onDidDismiss={onDismiss} initialBreakpoint={0.5} breakpoints={[0, 0.5, 0.8]}>
       <IonHeader>
-        <IonToolbar {...rtlAttrs}>
+        <IonToolbar className="close-only-toolbar" {...rtlAttrs}>
           <IonButtons slot="end">
             <IonButton onClick={onDismiss} aria-label={t("close")}>
               <IonIcon icon={closeOutline} slot="icon-only" />

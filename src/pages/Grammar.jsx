@@ -5,6 +5,7 @@ import { IonPage, IonContent, IonList, IonItem, IonLabel, IonBackButton, IonButt
 import { useUiLang } from "../context/UiLangContext.jsx";
 import { getLevel } from "../levels/index.js";
 import { LEVEL_GRAMMAR } from "../lib/content.js";
+import { bidiSafe } from "../lib/bidi.jsx";
 import BottomTabBar from "../components/BottomTabBar.jsx";
 import LevelPills from "../components/LevelPills.jsx";
 import GrammarTopicModal from "../components/GrammarTopicModal.jsx";
@@ -42,7 +43,7 @@ export default function Grammar() {
               <IonLabel dir="ltr" lang="en">
                 <span className="grammar-topic-en">{g.topic}</span>
                 <span className="grammar-topic-ar" dir="rtl" lang="ar">
-                  {g.topicAr}
+                  {bidiSafe(g.topicAr)}
                 </span>
               </IonLabel>
             </IonItem>

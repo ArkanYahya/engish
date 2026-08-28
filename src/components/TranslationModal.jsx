@@ -8,7 +8,7 @@ export default function TranslationModal({ isOpen, onClose, questionEn, question
   return (
     <IonModal isOpen={isOpen} onDidDismiss={onClose} className="popup-modal">
       <IonHeader>
-        <IonToolbar>
+        <IonToolbar className="close-only-toolbar">
           <IonButtons slot="end">
             <IonButton onClick={onClose} aria-label={t("close")}>
               <IonIcon icon={closeOutline} slot="icon-only" />
