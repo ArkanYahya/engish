@@ -8,9 +8,8 @@
 // tests: Subject Pronouns, Possessive Adjectives, There is / There are, Can (Ability),
 // and Imperatives. Reworking a1.js's question bank to cover them would renumber its
 // fixed 500-question set and break every existing user's saved progress (answers are
-// stored positionally against that exact set), so instead each is marked
-// `testedInQuiz: false` and flagged with a small badge in the UI (see Grammar.jsx) —
-// honest bonus content rather than a silent mismatch.
+// stored positionally against that exact set), so they stay here as extra background
+// rather than expanding the quiz.
 
 export const GRAMMAR = [
   {
@@ -27,7 +26,6 @@ export const GRAMMAR = [
   {
     topic: "Subject Pronouns",
     topicAr: "ضمائر الفاعل",
-    testedInQuiz: false,
     rule: "Subject pronouns (I, you, he, she, it, we, they) come before the verb and show who is doing the action.",
     ruleAr: "ضمائر الفاعل (I, you, he, she, it, we, they) تأتي قبل الفعل وتوضح من يقوم بالفعل.",
     examples: [
@@ -72,7 +70,6 @@ export const GRAMMAR = [
   {
     topic: "Possessive Adjectives",
     topicAr: "صفات الملكية",
-    testedInQuiz: false,
     rule: "My, your, his, her, its, our, and their show who something belongs to.",
     ruleAr: "my وyour وhis وher وits وour وtheir توضح ملكية الشيء.",
     examples: [
@@ -95,7 +92,6 @@ export const GRAMMAR = [
   {
     topic: "There is / There are",
     topicAr: "there is / there are",
-    testedInQuiz: false,
     rule: "Use there is with singular nouns and there are with plural nouns to say something exists.",
     ruleAr: "استخدم there is مع الاسم المفرد وthere are مع الاسم الجمع للتعبير عن وجود شيء.",
     examples: [
@@ -129,7 +125,6 @@ export const GRAMMAR = [
   {
     topic: "Can (Ability)",
     topicAr: "can (القدرة)",
-    testedInQuiz: false,
     rule: "Use can + verb to talk about ability or permission. It doesn't change with the subject.",
     ruleAr: "استخدم can + الفعل للتعبير عن القدرة أو الإذن. لا يتغير مع الفاعل.",
     examples: [
@@ -141,7 +136,6 @@ export const GRAMMAR = [
   {
     topic: "Imperatives",
     topicAr: "صيغة الأمر",
-    testedInQuiz: false,
     rule: "Use the base verb (without a subject) to give orders, instructions, or requests.",
     ruleAr: "استخدم الفعل الأساسي (بدون فاعل) لإعطاء أوامر أو تعليمات أو طلبات.",
     examples: [
