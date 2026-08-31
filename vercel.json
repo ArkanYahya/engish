@@ -9,11 +9,5 @@
         }
       ]
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/__/auth/:path*",
-      "destination": "https://english-a1-b2.firebaseapp.com/__/auth/:path*"
-    }
   ]
 }
