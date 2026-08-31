@@ -1,14 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { IonFooter, IonAlert } from "@ionic/react";
 import { useNavigate } from "react-router-dom";
 
 import { useUiLang } from "../context/UiLangContext.jsx";
+import { useSync } from "../context/SyncContext.jsx";
 import { LEVEL_VOCABULARY, LEVEL_GRAMMAR } from "../lib/content.js";
-import { exportProgressData, importProgressData } from "../lib/storage.js";
+import { exportProgressData, importProgressData, summarizeProgressData } from "../lib/storage.js";
 import { HomeIcon, BookIcon, GrammarIcon, SettingsIcon } from "./icons.jsx";
 import SettingsModal from "./SettingsModal.jsx";
 import AboutModal from "./AboutModal.jsx";
-import FirebaseTestModal from "./FirebaseTestModal.jsx";
 
 // Persistent bottom navigation for the "browsing" screens (Home, Vocabulary, Grammar) —
 // replaces the old fixed top toolbar there. Vocabulary/Grammar are level-scoped and only
@@ -19,28 +19,15 @@ import FirebaseTestModal from "./FirebaseTestModal.jsx";
 export default function BottomTabBar({ active, levelId }) {
   const navigate = useNavigate();
   const { t, isArabicUi } = useUiLang();
+  const { conflict, resolveConflict } = useSync();
   const [settingsOpen, setSettingsOpen] = useState(false);
   // Owned up here, not inside SettingsModal — Settings closes itself the instant About/
   // Backup/Restore is picked (see SettingsModal), and IonModal drops its children while
   // isOpen is false, so anything nested inside SettingsModal's own JSX would get unmounted
-  // right along with it (a real bug caught with AboutModal — the hidden file input below
-  // would lose its pending file-picker interaction the same way). Keeping all of these as
-  // siblings, each independently controlled, avoids that.
+  // right along with it (a real bug caught with an earlier Firebase-test panel — the hidden
+  // file input below would lose its pending file-picker interaction the same way). Keeping
+  // all of these as siblings, each independently controlled, avoids that.
   const [aboutOpen, setAboutOpen] = useState(false);
-  const [firebaseTestOpen, setFirebaseTestOpen] = useState(false); // TEMPORARY — Phase 1 spike
-  // Auto-reopen the test panel if we're coming back from a Google sign-in redirect (see
-  // AuthContext.signIn) — otherwise the redirect lands back on a fresh Home screen with
-  // Settings closed, and it's easy to miss ever seeing whether sign-in actually worked.
-  useEffect(() => {
-    try {
-      if (sessionStorage.getItem("firebaseTestReturnPending") === "1") {
-        sessionStorage.removeItem("firebaseTestReturnPending");
-        setFirebaseTestOpen(true);
-      }
-    } catch {
-      // ignore
-    }
-  }, []);
   const fileInputRef = useRef(null);
   const [pendingImport, setPendingImport] = useState(null);
   const [importError, setImportError] = useState(false);
@@ -91,6 +78,17 @@ export default function BottomTabBar({ active, levelId }) {
     window.location.reload();
   }
 
+  // "N level(s) in progress · N word(s) mastered · N mistake(s) tracked", or a "no progress"
+  // fallback — same formatting for either side of the merge-conflict prompt below.
+  function formatSummary(data) {
+    const { levelsInProgress, mastered, mistakes } = summarizeProgressData(data);
+    const parts = [];
+    if (levelsInProgress > 0) parts.push(t("syncSummaryLevels", levelsInProgress));
+    if (mastered > 0) parts.push(t("syncSummaryMastered", mastered));
+    if (mistakes > 0) parts.push(t("syncSummaryMistakes", mistakes));
+    return parts.length > 0 ? parts.join(" · ") : t("syncNoProgress");
+  }
+
   return (
     <>
       <IonFooter>
@@ -129,10 +127,8 @@ export default function BottomTabBar({ active, levelId }) {
         onOpenAbout={() => setAboutOpen(true)}
         onBackup={handleBackup}
         onRestoreClick={handleRestoreClick}
-        onOpenFirebaseTest={() => setFirebaseTestOpen(true)}
       />
       <AboutModal isOpen={aboutOpen} onClose={() => setAboutOpen(false)} />
-      <FirebaseTestModal isOpen={firebaseTestOpen} onClose={() => setFirebaseTestOpen(false)} />
 
       <input
         ref={fileInputRef}
@@ -156,6 +152,21 @@ export default function BottomTabBar({ active, levelId }) {
         onDidDismiss={() => setImportError(false)}
         header={t("restoreInvalidFile")}
         buttons={[{ text: t("close") }]}
+      />
+
+      {/* Only real conflict case: both this device and the signed-in account have their own
+          real progress and they differ (see SyncContext) — every other combination resolves
+          itself silently. No dismiss-by-backdrop: this needs an actual choice, not a "close
+          and pretend it didn't happen" that would just re-prompt on next launch anyway. */}
+      <IonAlert
+        isOpen={!!conflict}
+        backdropDismiss={false}
+        header={t("syncConflictTitle")}
+        message={conflict ? t("syncConflictBody", formatSummary(conflict.localData), formatSummary(conflict.cloudData)) : ""}
+        buttons={[
+          { text: t("syncConflictKeepDevice"), handler: () => resolveConflict("local") },
+          { text: t("syncConflictKeepCloud"), handler: () => resolveConflict("cloud") },
+        ]}
       />
     </>
   );

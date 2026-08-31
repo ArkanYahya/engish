@@ -1,23 +1,27 @@
-import { IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonContent, IonItem, IonLabel, IonToggle } from "@ionic/react";
+import { IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonContent, IonItem, IonLabel, IonToggle, IonSpinner } from "@ionic/react";
 import { closeOutline } from "ionicons/icons";
 
 import { useTheme } from "../context/ThemeContext.jsx";
 import { useUiLang } from "../context/UiLangContext.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
+import { useSync } from "../context/SyncContext.jsx";
 
 const ACCENTS = ["violet", "red"];
 
-// App-wide preferences — language, accent color, and light/dark mode — reachable from the
-// Settings tab in the bottom bar. Presented as a real bottom-sheet menu (drag handle, same
-// pattern as StageSheet) rather than the centered "popup-modal" card style — About opens
-// from here as its own popup-modal, and a floating card stacked on top of another floating
-// card read as visually confusing, whereas a card over a sheet reads as an actual menu item
-// opening.
+// App-wide preferences — language, accent color, light/dark mode, and account — reachable
+// from the Settings tab in the bottom bar. Presented as a real bottom-sheet menu (drag
+// handle, same pattern as StageSheet) rather than the centered "popup-modal" card style —
+// About opens from here as its own popup-modal, and a floating card stacked on top of
+// another floating card read as visually confusing, whereas a card over a sheet reads as an
+// actual menu item opening.
 //
 // About and the backup/restore file-picker live as siblings in BottomTabBar, not nested
 // here — see the comment there for why.
-export default function SettingsModal({ isOpen, onClose, onOpenAbout, onBackup, onRestoreClick, onOpenFirebaseTest }) {
+export default function SettingsModal({ isOpen, onClose, onOpenAbout, onBackup, onRestoreClick }) {
   const { isDark, selectMode, accent, selectAccent } = useTheme();
   const { uiLang, t, rtlAttrs, toggleUiLang } = useUiLang();
+  const { firebaseReady, user, signingIn, signIn, signOut } = useAuth();
+  const { status: syncStatus } = useSync();
 
   // Every choice in this sheet dismisses it, same as a native action sheet — picking a
   // language, an accent, flipping dark mode, or picking About/Backup/Restore all close the
@@ -52,13 +56,8 @@ export default function SettingsModal({ isOpen, onClose, onOpenAbout, onBackup, 
     onClose();
   }
 
-  function openFirebaseTest() {
-    onOpenFirebaseTest();
-    onClose();
-  }
-
   return (
-    <IonModal isOpen={isOpen} onDidDismiss={onClose} initialBreakpoint={0.76} breakpoints={[0, 0.76]}>
+    <IonModal isOpen={isOpen} onDidDismiss={onClose} initialBreakpoint={0.92} breakpoints={[0, 0.92]}>
       <IonHeader>
         <IonToolbar {...rtlAttrs}>
           <IonTitle>{t("settings")}</IonTitle>
@@ -121,10 +120,41 @@ export default function SettingsModal({ isOpen, onClose, onOpenAbout, onBackup, 
         <IonItem button onClick={openAbout} lines="none" detail>
           <IonLabel>{t("about")}</IonLabel>
         </IonItem>
-        {/* TEMPORARY — Phase 1 Firebase test spike, not translated on purpose (dev-only, remove before Phase 2). */}
-        <IonItem button onClick={openFirebaseTest} lines="none" detail>
-          <IonLabel>🔥 Firebase Test (dev)</IonLabel>
-        </IonItem>
+
+        {firebaseReady && (
+          <>
+            <p className="settings-section-label">{t("account")}</p>
+            {user ? (
+              <>
+                <IonItem lines="none">
+                  <IonLabel>
+                    <p>{t("signedInAs", user.email)}</p>
+                    <p className="settings-sync-status">
+                      {syncStatus === "syncing" && (
+                        <>
+                          <IonSpinner name="dots" style={{ width: 16, height: 16 }} /> {t("syncStatusSyncing")}
+                        </>
+                      )}
+                      {syncStatus === "synced" && t("syncStatusSynced")}
+                      {syncStatus === "error" && t("syncStatusError")}
+                    </p>
+                  </IonLabel>
+                </IonItem>
+                {/* Not auto-closed like the rest of this sheet — signing out is a state the
+                    learner benefits from actually watching happen here, not something that
+                    should whisk the sheet away the instant it's tapped. */}
+                <IonItem button onClick={signOut} lines="none">
+                  <IonLabel color="danger">{t("signOut")}</IonLabel>
+                </IonItem>
+              </>
+            ) : (
+              <IonItem button onClick={signIn} disabled={signingIn} lines="none">
+                <IonLabel>{signingIn ? t("syncStatusSyncing") : t("signInWithGoogle")}</IonLabel>
+                {signingIn && <IonSpinner name="dots" slot="end" />}
+              </IonItem>
+            )}
+          </>
+        )}
       </IonContent>
     </IonModal>
   );

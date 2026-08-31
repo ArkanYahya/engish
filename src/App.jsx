@@ -7,6 +7,7 @@ import { ThemeProvider } from "./context/ThemeContext.jsx";
 import { UiLangProvider } from "./context/UiLangContext.jsx";
 import { QuizProvider } from "./context/QuizContext.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
+import { SyncProvider } from "./context/SyncContext.jsx";
 import { hasCompletedOnboarding } from "./lib/storage.js";
 import Onboarding from "./components/Onboarding.jsx";
 import LevelPicker from "./pages/LevelPicker.jsx";
@@ -33,26 +34,28 @@ export default function App() {
     <ThemeProvider>
       <UiLangProvider>
         <AuthProvider>
-          <QuizProvider>
-            <IonApp>
-              {onboarded ? (
-                <IonReactRouter>
-                  <IonRouterOutlet>
-                    <Route path="/" element={<LevelPicker />} />
-                    <Route path="/quiz/:levelId" element={<Question />} />
-                    <Route path="/quiz/:levelId/stage/:stageIndex/complete" element={<StageComplete />} />
-                    <Route path="/quiz/:levelId/stage/:stageIndex/review" element={<StageReview />} />
-                    <Route path="/quiz/:levelId/results" element={<Results />} />
-                    <Route path="/quiz/:levelId/vocabulary" element={<Vocabulary />} />
-                    <Route path="/quiz/:levelId/grammar" element={<Grammar />} />
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                  </IonRouterOutlet>
-                </IonReactRouter>
-              ) : (
-                <Onboarding onComplete={() => setOnboarded(true)} />
-              )}
-            </IonApp>
-          </QuizProvider>
+          <SyncProvider>
+            <QuizProvider>
+              <IonApp>
+                {onboarded ? (
+                  <IonReactRouter>
+                    <IonRouterOutlet>
+                      <Route path="/" element={<LevelPicker />} />
+                      <Route path="/quiz/:levelId" element={<Question />} />
+                      <Route path="/quiz/:levelId/stage/:stageIndex/complete" element={<StageComplete />} />
+                      <Route path="/quiz/:levelId/stage/:stageIndex/review" element={<StageReview />} />
+                      <Route path="/quiz/:levelId/results" element={<Results />} />
+                      <Route path="/quiz/:levelId/vocabulary" element={<Vocabulary />} />
+                      <Route path="/quiz/:levelId/grammar" element={<Grammar />} />
+                      <Route path="*" element={<Navigate to="/" replace />} />
+                    </IonRouterOutlet>
+                  </IonReactRouter>
+                ) : (
+                  <Onboarding onComplete={() => setOnboarded(true)} />
+                )}
+              </IonApp>
+            </QuizProvider>
+          </SyncProvider>
         </AuthProvider>
       </UiLangProvider>
     </ThemeProvider>
