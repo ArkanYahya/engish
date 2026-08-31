@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IonFooter, IonAlert } from "@ionic/react";
 import { useNavigate } from "react-router-dom";
 
@@ -28,6 +28,19 @@ export default function BottomTabBar({ active, levelId }) {
   // file input below would lose its pending file-picker interaction the same way). Keeping
   // all of these as siblings, each independently controlled, avoids that.
   const [aboutOpen, setAboutOpen] = useState(false);
+  // Reopen Settings automatically if we're coming back from Apple's sign-in redirect (see
+  // AuthContext.signInApple) — otherwise the redirect lands back on a fresh Home screen with
+  // Settings closed, and it's easy to miss ever seeing whether sign-in actually worked.
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem("authReturnPending") === "1") {
+        sessionStorage.removeItem("authReturnPending");
+        setSettingsOpen(true);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
   const fileInputRef = useRef(null);
   const [pendingImport, setPendingImport] = useState(null);
   const [importError, setImportError] = useState(false);

@@ -20,7 +20,7 @@ const ACCENTS = ["violet", "red"];
 export default function SettingsModal({ isOpen, onClose, onOpenAbout, onBackup, onRestoreClick }) {
   const { isDark, selectMode, accent, selectAccent } = useTheme();
   const { uiLang, t, rtlAttrs, toggleUiLang } = useUiLang();
-  const { firebaseReady, user, signingIn, signInGoogle, signInApple, signOut } = useAuth();
+  const { firebaseReady, user, signingIn, checkingRedirect, signInGoogle, signInApple, signOut } = useAuth();
   const { status: syncStatus } = useSync();
 
   // Every choice in this sheet dismisses it, same as a native action sheet — picking a
@@ -149,13 +149,17 @@ export default function SettingsModal({ isOpen, onClose, onOpenAbout, onBackup, 
               </>
             ) : (
               <>
-                <IonItem button onClick={signInGoogle} disabled={signingIn} lines="none">
+                <IonItem button onClick={signInGoogle} disabled={signingIn || checkingRedirect} lines="none">
                   <IonLabel>{t("signInWithGoogle")}</IonLabel>
                   {signingIn && <IonSpinner name="dots" slot="end" />}
                 </IonItem>
-                <IonItem button onClick={signInApple} disabled={signingIn} lines="none">
+                {/* Apple's own sign-in redirects the whole page away and back (see
+                    AuthContext) — checkingRedirect covers the moment right after that return,
+                    before getRedirectResult() has resolved, so this doesn't flash "sign in"
+                    right before the just-completed sign-in shows up. */}
+                <IonItem button onClick={signInApple} disabled={signingIn || checkingRedirect} lines="none">
                   <IonLabel>{t("signInWithApple")}</IonLabel>
-                  {signingIn && <IonSpinner name="dots" slot="end" />}
+                  {checkingRedirect && <IonSpinner name="dots" slot="end" />}
                 </IonItem>
               </>
             )}
