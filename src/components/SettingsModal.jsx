@@ -20,7 +20,8 @@ const ACCENTS = ["violet", "red"];
 export default function SettingsModal({ isOpen, onClose, onOpenAbout, onBackup, onRestoreClick }) {
   const { isDark, selectMode, accent, selectAccent } = useTheme();
   const { uiLang, t, rtlAttrs, toggleUiLang } = useUiLang();
-  const { firebaseReady, user, signingIn, checkingRedirect, signInGoogle, signInApple, signOut } = useAuth();
+  const { firebaseReady, user, signingIn, checkingRedirect, authError, signInGoogle, signInApple, signOut } =
+    useAuth();
   const { status: syncStatus } = useSync();
 
   // Every choice in this sheet dismisses it, same as a native action sheet — picking a
@@ -161,6 +162,11 @@ export default function SettingsModal({ isOpen, onClose, onOpenAbout, onBackup, 
                   <IonLabel>{t("signInWithApple")}</IonLabel>
                   {checkingRedirect && <IonSpinner name="dots" slot="end" />}
                 </IonItem>
+                {authError && (
+                  <p style={{ color: "var(--coral)", fontSize: 13, margin: "8px 16px 0" }}>
+                    {authError.code || authError.message}
+                  </p>
+                )}
               </>
             )}
           </>
