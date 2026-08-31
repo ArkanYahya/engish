@@ -29,19 +29,17 @@ export function AuthProvider({ children }) {
   const [checkingRedirect, setCheckingRedirect] = useState(firebaseReady);
   const [authError, setAuthError] = useState(null);
   const [signingIn, setSigningIn] = useState(false);
-  // Debug-only (rendered in SettingsModal) — what getRedirectResult() actually found on this
-  // load. "none" with no authError means Apple's own sign-in succeeded but the credential
-  // never made it back to this page at all (the third-party-storage-blocking failure mode
-  // Firebase's docs describe) — a real user/error tells us something different is wrong.
-  const [redirectDebug, setRedirectDebug] = useState(null);
 
   useEffect(() => {
     if (!firebaseReady) return;
 
+    // Apple sign-in is known-broken on the web (see the Apple-sign-in investigation):
+    // signInWithRedirect's credential handoff gets lost to browser cross-site storage
+    // blocking between our domain and Firebase's authDomain, confirmed via a debug build
+    // that logged getRedirectResult()'s actual outcome ("none" every time, despite Apple's
+    // own login completing) — removed now that the cause is confirmed, not still open.
     getRedirectResult(auth)
-      .then((result) => setRedirectDebug(result ? `user: ${result.user?.email}` : "none"))
       .catch((err) => {
-        setRedirectDebug(`error: ${err.code || err.message}`);
         if (err.code !== "auth/popup-closed-by-user") setAuthError(err);
       })
       .finally(() => setCheckingRedirect(false));
@@ -100,7 +98,6 @@ export function AuthProvider({ children }) {
         authLoading,
         checkingRedirect,
         authError,
-        redirectDebug,
         signingIn,
         signInGoogle,
         signInApple,

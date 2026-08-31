@@ -20,7 +20,7 @@ const ACCENTS = ["violet", "red"];
 export default function SettingsModal({ isOpen, onClose, onOpenAbout, onBackup, onRestoreClick }) {
   const { isDark, selectMode, accent, selectAccent } = useTheme();
   const { uiLang, t, rtlAttrs, toggleUiLang } = useUiLang();
-  const { firebaseReady, user, signingIn, checkingRedirect, authError, redirectDebug, signInGoogle, signInApple, signOut } =
+  const { firebaseReady, user, signingIn, checkingRedirect, authError, signInGoogle, signInApple, signOut } =
     useAuth();
   const { status: syncStatus } = useSync();
 
@@ -162,11 +162,6 @@ export default function SettingsModal({ isOpen, onClose, onOpenAbout, onBackup, 
                   <IonLabel>{t("signInWithApple")}</IonLabel>
                   {checkingRedirect && <IonSpinner name="dots" slot="end" />}
                 </IonItem>
-                {redirectDebug && (
-                  <p style={{ color: "var(--ink-faint)", fontSize: 12, margin: "8px 16px 0" }}>
-                    Redirect check: {redirectDebug}
-                  </p>
-                )}
                 {authError && (
                   <p style={{ color: "var(--coral)", fontSize: 13, margin: "8px 16px 0" }}>
                     {authError.code || authError.message}
