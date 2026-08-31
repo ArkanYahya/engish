@@ -1,3 +1,9 @@
 node_modules/
 dist/
 .DS_Store
+
+# Firebase web config (see .env.local.example) — not a secret in the security sense (it's
+# meant to ship in client code), but kept out of git anyway since it's env-specific and
+# there's no reason to force a rebuild/commit every time a project setting changes.
+.env.local
+.env.*.local

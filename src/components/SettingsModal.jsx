@@ -15,7 +15,7 @@ const ACCENTS = ["violet", "red"];
 //
 // About and the backup/restore file-picker live as siblings in BottomTabBar, not nested
 // here — see the comment there for why.
-export default function SettingsModal({ isOpen, onClose, onOpenAbout, onBackup, onRestoreClick }) {
+export default function SettingsModal({ isOpen, onClose, onOpenAbout, onBackup, onRestoreClick, onOpenFirebaseTest }) {
   const { isDark, selectMode, accent, selectAccent } = useTheme();
   const { uiLang, t, rtlAttrs, toggleUiLang } = useUiLang();
 
@@ -52,8 +52,13 @@ export default function SettingsModal({ isOpen, onClose, onOpenAbout, onBackup, 
     onClose();
   }
 
+  function openFirebaseTest() {
+    onOpenFirebaseTest();
+    onClose();
+  }
+
   return (
-    <IonModal isOpen={isOpen} onDidDismiss={onClose} initialBreakpoint={0.68} breakpoints={[0, 0.68]}>
+    <IonModal isOpen={isOpen} onDidDismiss={onClose} initialBreakpoint={0.76} breakpoints={[0, 0.76]}>
       <IonHeader>
         <IonToolbar {...rtlAttrs}>
           <IonTitle>{t("settings")}</IonTitle>
@@ -115,6 +120,10 @@ export default function SettingsModal({ isOpen, onClose, onOpenAbout, onBackup, 
         </IonItem>
         <IonItem button onClick={openAbout} lines="none" detail>
           <IonLabel>{t("about")}</IonLabel>
+        </IonItem>
+        {/* TEMPORARY — Phase 1 Firebase test spike, not translated on purpose (dev-only, remove before Phase 2). */}
+        <IonItem button onClick={openFirebaseTest} lines="none" detail>
+          <IonLabel>🔥 Firebase Test (dev)</IonLabel>
         </IonItem>
       </IonContent>
     </IonModal>

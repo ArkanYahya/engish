@@ -16,6 +16,7 @@
   "dependencies": {
     "@ionic/react": "^9.0.1",
     "@ionic/react-router": "^9.0.1",
+    "firebase": "^12.18.0",
     "ionicons": "^8.1.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",

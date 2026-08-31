@@ -24,6 +24,11 @@ export default defineConfig({
       includeAssets: ["favicon.png", "apple-touch-icon.png", "icon-192.png", "icon-512.png"],
       workbox: {
         globPatterns: ["**/*.{js,css,html,png,webmanifest}"],
+        // Default is 2 MiB — the Firebase SDK (Phase 1 test spike, see AuthContext/
+        // FirebaseTestModal) pushes the main bundle past that. Revisit with real
+        // code-splitting (dynamic import of firebase/* only where it's used) once this
+        // becomes the real synced-progress feature instead of a throwaway test panel.
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
       },
     }),
   ],

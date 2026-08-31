@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IonFooter, IonAlert } from "@ionic/react";
 import { useNavigate } from "react-router-dom";
 
@@ -8,6 +8,7 @@ import { exportProgressData, importProgressData } from "../lib/storage.js";
 import { HomeIcon, BookIcon, GrammarIcon, SettingsIcon } from "./icons.jsx";
 import SettingsModal from "./SettingsModal.jsx";
 import AboutModal from "./AboutModal.jsx";
+import FirebaseTestModal from "./FirebaseTestModal.jsx";
 
 // Persistent bottom navigation for the "browsing" screens (Home, Vocabulary, Grammar) —
 // replaces the old fixed top toolbar there. Vocabulary/Grammar are level-scoped and only
@@ -26,6 +27,20 @@ export default function BottomTabBar({ active, levelId }) {
   // would lose its pending file-picker interaction the same way). Keeping all of these as
   // siblings, each independently controlled, avoids that.
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [firebaseTestOpen, setFirebaseTestOpen] = useState(false); // TEMPORARY — Phase 1 spike
+  // Auto-reopen the test panel if we're coming back from a Google sign-in redirect (see
+  // AuthContext.signIn) — otherwise the redirect lands back on a fresh Home screen with
+  // Settings closed, and it's easy to miss ever seeing whether sign-in actually worked.
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem("firebaseTestReturnPending") === "1") {
+        sessionStorage.removeItem("firebaseTestReturnPending");
+        setFirebaseTestOpen(true);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
   const fileInputRef = useRef(null);
   const [pendingImport, setPendingImport] = useState(null);
   const [importError, setImportError] = useState(false);
@@ -114,8 +129,10 @@ export default function BottomTabBar({ active, levelId }) {
         onOpenAbout={() => setAboutOpen(true)}
         onBackup={handleBackup}
         onRestoreClick={handleRestoreClick}
+        onOpenFirebaseTest={() => setFirebaseTestOpen(true)}
       />
       <AboutModal isOpen={aboutOpen} onClose={() => setAboutOpen(false)} />
+      <FirebaseTestModal isOpen={firebaseTestOpen} onClose={() => setFirebaseTestOpen(false)} />
 
       <input
         ref={fileInputRef}
