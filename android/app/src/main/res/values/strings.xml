@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">HamoLingo</string>
+    <string name="title_activity_main">HamoLingo</string>
+    <string name="package_name">com.northstorm.hamolingo</string>
+    <string name="custom_url_scheme">com.northstorm.hamolingo</string>
+</resources>

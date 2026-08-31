@@ -1,8 +1,13 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { Capacitor } from "@capacitor/core";
+import { FirebaseAuthentication } from "@capacitor-firebase/authentication";
 import {
   signInWithPopup,
   signInWithRedirect,
+  signInWithCredential,
   getRedirectResult,
+  GoogleAuthProvider,
+  OAuthProvider,
   signOut as firebaseSignOut,
   onAuthStateChanged,
 } from "firebase/auth";
@@ -10,39 +15,42 @@ import {
 import { auth, googleProvider, appleProvider, firebaseReady } from "../lib/firebase.js";
 
 const AuthContext = createContext(null);
+const isNative = Capacitor.isNativePlatform();
 
-// Google: popup — Phase 1 testing (see the Firebase discussion) found signInWithRedirect's
-// cross-origin storage handoff unreliable even on a plain desktop browser tab on localhost,
-// while popup completed cleanly in both a regular mobile browser tab and the installed PWA
-// on Android/iOS.
+// Two completely different sign-in mechanisms depending on where this is running, not one
+// mechanism with a fallback:
 //
-// Apple: redirect, not popup — the opposite conclusion, for the opposite reason. Apple's own
-// sign-in page rejects being opened as a popup from Safari/WebKit ("The requested action is
-// invalid", confirmed failing in both a plain Safari tab and the installed PWA on iPhone) —
-// unlike Google, Apple's flow is natively built around a full-page redirect
-// (response_mode=form_post), so redirect is the flow Apple actually expects here, not a
-// fallback. Since this navigates the whole page away and back, getRedirectResult() has to be
-// checked once on mount, same as the original Phase 1 spike did for Google.
+// On native (iOS/Android via Capacitor): the real fix for the Apple-sign-in problem this app
+// spent a long investigation on — native Google/Apple sign-in via @capacitor-firebase/
+// authentication uses the OS's own account picker (no browser, no redirect, no third-party
+// storage involved at all), then bridges the resulting credential into this same Firebase JS
+// `auth` object via signInWithCredential so every downstream feature (SyncContext,
+// onAuthStateChanged, all of it) keeps working exactly as it already does. See
+// https://github.com/capawesome-team/capacitor-firebase — this is their documented pattern,
+// not something improvised here.
+//
+// On web: unchanged from what was already proven out — Google via popup (reliable), Apple via
+// redirect (kept only so the button still attempts something on web; known not to complete
+// there — see the Apple-sign-in-on-web investigation. Native is the real fix for Apple, not
+// this path).
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(firebaseReady);
-  const [checkingRedirect, setCheckingRedirect] = useState(firebaseReady);
+  const [checkingRedirect, setCheckingRedirect] = useState(firebaseReady && !isNative);
   const [authError, setAuthError] = useState(null);
   const [signingIn, setSigningIn] = useState(false);
 
   useEffect(() => {
     if (!firebaseReady) return;
 
-    // Apple sign-in is known-broken on the web (see the Apple-sign-in investigation):
-    // signInWithRedirect's credential handoff gets lost to browser cross-site storage
-    // blocking between our domain and Firebase's authDomain, confirmed via a debug build
-    // that logged getRedirectResult()'s actual outcome ("none" every time, despite Apple's
-    // own login completing) — removed now that the cause is confirmed, not still open.
-    getRedirectResult(auth)
-      .catch((err) => {
-        if (err.code !== "auth/popup-closed-by-user") setAuthError(err);
-      })
-      .finally(() => setCheckingRedirect(false));
+    // Redirect-result checking is a web-only concern — native never uses signInWithRedirect.
+    if (!isNative) {
+      getRedirectResult(auth)
+        .catch((err) => {
+          if (err.code !== "auth/popup-closed-by-user") setAuthError(err);
+        })
+        .finally(() => setCheckingRedirect(false));
+    }
 
     const unsubscribe = onAuthStateChanged(auth, (u) => {
       setUser(u);
@@ -56,9 +64,15 @@ export function AuthProvider({ children }) {
     setAuthError(null);
     setSigningIn(true);
     try {
-      await signInWithPopup(auth, googleProvider);
+      if (isNative) {
+        const result = await FirebaseAuthentication.signInWithGoogle();
+        const credential = GoogleAuthProvider.credential(result.credential?.idToken);
+        await signInWithCredential(auth, credential);
+      } else {
+        await signInWithPopup(auth, googleProvider);
+      }
     } catch (err) {
-      // The user closing the popup themselves isn't an error worth surfacing.
+      // The user closing the popup/native sheet themselves isn't an error worth surfacing.
       if (err.code !== "auth/popup-closed-by-user" && err.code !== "auth/cancelled-popup-request") {
         setAuthError(err);
       }
@@ -67,26 +81,42 @@ export function AuthProvider({ children }) {
     }
   }
 
-  function signInApple() {
+  async function signInApple() {
     if (!firebaseReady) return;
     setAuthError(null);
-    // Marker so the app can reopen Settings automatically once Apple redirects back —
-    // otherwise the redirect returns to a fresh Home screen with Settings closed, and it's
-    // easy to miss ever seeing whether sign-in actually worked (see BottomTabBar).
+
+    if (isNative) {
+      setSigningIn(true);
+      try {
+        // skipNativeAuth so the plugin doesn't also sign in on the native FirebaseAuth layer
+        // separately from this JS `auth` object — one sign-in, not two parallel ones.
+        const result = await FirebaseAuthentication.signInWithApple({ skipNativeAuth: true });
+        const provider = new OAuthProvider("apple.com");
+        const credential = provider.credential({
+          idToken: result.credential?.idToken,
+          rawNonce: result.credential?.nonce,
+        });
+        await signInWithCredential(auth, credential);
+      } catch (err) {
+        if (err.code !== "auth/popup-closed-by-user") setAuthError(err);
+      } finally {
+        setSigningIn(false);
+      }
+      return;
+    }
+
+    // Web path — kept for completeness, not because it works (see the top comment).
     try {
       sessionStorage.setItem("authReturnPending", "1");
     } catch {
       // ignore — worst case Settings just doesn't auto-reopen after the redirect
     }
-    // No setSigningIn(true)/finally here — this navigates the page away immediately, so
-    // there's no "back" from this call to reset that state from; the reload that follows
-    // sign-in resets everything anyway. Errors thrown here (as opposed to after the redirect
-    // returns) mean the redirect couldn't even start.
     signInWithRedirect(auth, appleProvider).catch((err) => setAuthError(err));
   }
 
   function signOut() {
     if (!firebaseReady) return;
+    if (isNative) FirebaseAuthentication.signOut();
     firebaseSignOut(auth);
   }
 

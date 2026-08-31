@@ -1,0 +1,11 @@
+{
+  "appId": "com.northstorm.hamolingo",
+  "appName": "HamoLingo",
+  "webDir": "dist",
+  "plugins": {
+    "FirebaseAuthentication": {
+      "skipNativeAuth": false,
+      "providers": ["apple.com", "google.com"]
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "187804387276",
+    "project_id": "english-a1-b2",
+    "storage_bucket": "english-a1-b2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:187804387276:android:b656a44b42741ad0e8bf69",
+        "android_client_info": {
+          "package_name": "com.northstorm.hamolingo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBkUkCKptTW_i1dPnaynPks7bABcTIG5t4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -9,11 +9,17 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@vitejs/plugin-react": "^4.7.0",
     "vite": "^5.4.0",
     "vite-plugin-pwa": "^1.3.0"
   },
   "dependencies": {
+    "@capacitor-firebase/authentication": "^8.5.0",
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/cli": "^8.5.0",
+    "@capacitor/core": "^8.5.0",
+    "@capacitor/ios": "^8.5.0",
     "@ionic/react": "^9.0.1",
     "@ionic/react-router": "^9.0.1",
     "firebase": "^12.18.0",

@@ -6,8 +6,9 @@
 // This file is safe to import even before .env.local is filled in: initialization is
 // skipped and `firebaseReady` is false, so callers can show "sign-in unavailable" instead of
 // crashing the whole app over a missing dev config.
+import { Capacitor } from "@capacitor/core";
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, OAuthProvider } from "firebase/auth";
+import { getAuth, initializeAuth, indexedDBLocalPersistence, GoogleAuthProvider, OAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const config = {
@@ -29,7 +30,10 @@ let appleProvider = null;
 
 if (firebaseReady) {
   app = initializeApp(config);
-  auth = getAuth(app);
+  // Native (Capacitor iOS/Android) needs explicit IndexedDB persistence so sign-in survives
+  // app restarts — getAuth()'s default persistence assumes a browser. Web keeps plain
+  // getAuth(), whose default (browserLocalPersistence) is already the right thing there.
+  auth = Capacitor.isNativePlatform() ? initializeAuth(app, { persistence: indexedDBLocalPersistence }) : getAuth(app);
   db = getFirestore(app);
   googleProvider = new GoogleAuthProvider();
   // Requires the Apple provider enabled in Firebase console (Services ID, Team ID, Key ID,
