@@ -7,7 +7,7 @@
 // skipped and `firebaseReady` is false, so callers can show "sign-in unavailable" instead of
 // crashing the whole app over a missing dev config.
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, OAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const config = {
@@ -25,12 +25,20 @@ let app = null;
 let auth = null;
 let db = null;
 let googleProvider = null;
+let appleProvider = null;
 
 if (firebaseReady) {
   app = initializeApp(config);
   auth = getAuth(app);
   db = getFirestore(app);
   googleProvider = new GoogleAuthProvider();
+  // Requires the Apple provider enabled in Firebase console (Services ID, Team ID, Key ID,
+  // private key — all configured on the Apple Developer + Firebase console side, not here).
+  // "email"/"name" are the standard scopes; Apple only returns name on the very first
+  // sign-in ever for a given user, so nothing here should assume it's always present.
+  appleProvider = new OAuthProvider("apple.com");
+  appleProvider.addScope("email");
+  appleProvider.addScope("name");
 } else if (import.meta.env.DEV) {
   // eslint-disable-next-line no-console
   console.warn(
@@ -38,4 +46,4 @@ if (firebaseReady) {
   );
 }
 
-export { app, auth, db, googleProvider };
+export { app, auth, db, googleProvider, appleProvider };
